@@ -4,8 +4,8 @@
 *.jar
 
 
-*classes/*
-*test-reports/*
+classes/
+generated-sources/
 
 
 # Scala-IDE specific
@@ -235,11 +235,6 @@ ENV/
 
 # mkdocs documentation
 /site
-
-
-# Scala
-*.class
-*.log
 
 
 # R FILES
