@@ -48,12 +48,16 @@ object App {
 
     // Prepare local directories
     val appDirectories = new AppDirectories()
-    appDirectories.localDirectories(localSettings.dataDirectory)
-    appDirectories.localDirectories(localSettings.warehouseDirectory)
+    val dataDir = appDirectories.localDirectories(localSettings.dataDirectory)
+    val warehouseDir = appDirectories.localDirectories(localSettings.warehouseDirectory)
 
+    if (dataDir.isSuccess && warehouseDir.isSuccess) {
+      val dataSteps = new DataSteps(spark)
+      dataSteps.dataSteps()
+    } else {
+      sys.error("Unable to set-up local directories")
+    }
 
-    val dataSteps = new DataSteps(spark)
-    dataSteps.dataSteps()
 
 
 
