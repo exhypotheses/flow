@@ -7,7 +7,7 @@ import scala.util.control.Exception
 
 class IsExistURL {
 
-  def isExistURL(urlString: String): Boolean = {
+  def isExistURL(urlString: String): Try[Boolean] = {
 
 
     // Do not follow re-directs
@@ -15,7 +15,7 @@ class IsExistURL {
 
 
     // Determine whether the URL exists
-    val T: Try[Boolean] = Exception.allCatch.withTry({
+    val request: Try[Boolean] = Exception.allCatch.withTry({
 
       val httpURLConnection: HttpURLConnection = new URL(urlString).openConnection().asInstanceOf[HttpURLConnection]
       httpURLConnection.setInstanceFollowRedirects(false)
@@ -29,10 +29,10 @@ class IsExistURL {
 
 
     // Hence
-    if (T.isSuccess) {
-      T.get
+    if (request.isSuccess) {
+      request
     } else {
-      sys.error(s"Error: ($urlString)" + T.failed.get.getMessage)
+      sys.error(s"Error: ($urlString)" + request.failed.get.getMessage)
     }
 
 
