@@ -3,8 +3,8 @@
   "fields": [
     {
       "name": "started_at",
-      "type": "timestamp",
-      "nullable": false,
+      "type": "string",
+      "nullable": true,
       "metadata":
       {
         "comment": "Ride starting time"
@@ -12,7 +12,7 @@
     },
     {
       "name": "ended_at",
-      "type": "timestamp",
+      "type": "string",
       "nullable": true,
       "metadata":
       {
@@ -21,7 +21,7 @@
     },
     {
       "name": "duration",
-      "type": "integer",
+      "type": "long",
       "nullable": true,
       "metadata":
       {
@@ -31,7 +31,7 @@
     {
       "name": "start_station_id",
       "type": "string",
-      "nullable": false,
+      "nullable": true,
       "metadata":
       {
         "comment": "The identification code of the starting station"
@@ -40,7 +40,7 @@
     {
       "name": "start_station_name",
       "type": "string",
-      "nullable": false,
+      "nullable": true,
       "metadata":
       {
         "comment": "The name of the starting station"
@@ -49,7 +49,7 @@
     {
       "name": "start_station_description",
       "type": "string",
-      "nullable": false,
+      "nullable": true,
       "metadata":
       {
         "comment": "The name of the starting station"
@@ -57,8 +57,8 @@
     },
     {
       "name": "start_station_latitude",
-      "type": "float",
-      "nullable": false,
+      "type": "double",
+      "nullable": true,
       "metadata":
       {
         "comment": "The starting station latitude"
@@ -66,8 +66,8 @@
     },
     {
       "name": "start_station_longitude",
-      "type": "float",
-      "nullable": false,
+      "type": "double",
+      "nullable": true,
       "metadata":
       {
         "comment": "The starting station longitude"
@@ -76,7 +76,7 @@
     {
       "name": "end_station_id",
       "type": "string",
-      "nullable": false,
+      "nullable": true,
       "metadata":
       {
         "comment": "The identification code of the end station"
@@ -85,7 +85,7 @@
     {
       "name": "end_station_name",
       "type": "string",
-      "nullable": false,
+      "nullable": true,
       "metadata":
       {
         "comment": "The name of the end station"
@@ -94,7 +94,7 @@
     {
       "name": "end_station_description",
       "type": "string",
-      "nullable": false,
+      "nullable": true,
       "metadata":
       {
         "comment": "The name of the end station"
@@ -102,8 +102,8 @@
     },
     {
       "name": "end_station_latitude",
-      "type": "float",
-      "nullable": false,
+      "type": "double",
+      "nullable": true,
       "metadata":
       {
         "comment": "The end station latitude"
@@ -111,8 +111,8 @@
     },
     {
       "name": "end_station_longitude",
-      "type": "float",
-      "nullable": false,
+      "type": "double",
+      "nullable": true,
       "metadata":
       {
         "comment": "The end station longitude"
