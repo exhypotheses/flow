@@ -1,5 +1,8 @@
 package com.grey.flow
 
+import java.nio.file.Paths
+
+import com.grey.time.{TimeConstraints, TimeFormat, TimeSeries}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
@@ -8,11 +11,12 @@ import org.joda.time.DateTime
 import scala.util.Try
 import scala.util.control.Exception
 
+
 class DataSteps(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
   private val interfaceVariables = new InterfaceVariables()
-
+  private val dataUnload = new DataUnload()
 
   def dataSteps(): Unit = {
 
@@ -21,7 +25,7 @@ class DataSteps(spark: SparkSession) {
       spark.sparkContext.textFile(localSettings.resourcesDirectory + "schemaOfSource.json")
     )
 
-    val schema: StructType = if (schemaProperties.isSuccess){
+    val schema: StructType = if (schemaProperties.isSuccess) {
       DataType.fromJson(schemaProperties.get.collect.mkString("")).asInstanceOf[StructType]
     } else {
       sys.error(schemaProperties.failed.get.getMessage)
@@ -39,42 +43,28 @@ class DataSteps(spark: SparkSession) {
     // List of dates
     val listOfDates: List[DateTime] = if (sequentialTimes) {
       val timeSeries = new TimeSeries()
-      timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType )
+      timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType)
     } else {
       sys.error("The start date must precede the end date")
     }
 
 
-    val isExistURL = new IsExistURL()
-    listOfDates.par.foreach{dateTime =>
+    listOfDates.par.foreach { dateTime =>
 
-      val url: String = interfaceVariables.api.format(dateTime.toString(interfaceVariables.dateTimePattern))
-      val isURL: Boolean = isExistURL.isExistURL(url)
+      println("Starting: " + dateTime.toString(interfaceVariables.dateTimePattern))
 
-      println(url)
-      println("Exists: " + isURL)
-      println(dateTime.getYear)
-      println(dateTime.getMonthOfYear)
+      val directoryName: String = Paths.get(localSettings.dataDirectory, dateTime.toString("yyyy")).toString
+      val fileString = directoryName + localSettings.localSeparator + dateTime.toString("MM") + ".json"
 
+      val unload = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName)
+
+      if (unload.isSuccess) {
+        val records = spark.read.schema(schema).json(fileString)
+        records.show()
+      }
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   }
 
