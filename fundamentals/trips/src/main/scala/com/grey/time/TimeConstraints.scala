@@ -1,10 +1,9 @@
-package com.grey.flow
+package com.grey.time
 
 import org.joda.time.DateTime
 
-import scala.util.control.Exception
-
 import scala.util.Try
+import scala.util.control.Exception
 
 class TimeConstraints {
 
