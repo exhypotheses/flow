@@ -1,11 +1,13 @@
-package com.grey.trips
+package com.grey
 
 import java.nio.file.Paths
 
-import com.grey.features.FeaturesSteps
+import com.grey.directories.LocalSettings
+import com.grey.functions.{Features, CandlePercentiles}
+import com.grey.trips.{DataUnload, InterfaceVariables}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
 
 import scala.util.Try
@@ -17,6 +19,8 @@ class DataSteps(spark: SparkSession) {
   private val localSettings = new LocalSettings()
   private val interfaceVariables = new InterfaceVariables()
   private val dataUnload = new DataUnload()
+  private val features = new Features(spark)
+  private val candlePercentiles = new CandlePercentiles(spark)
 
   def dataSteps(listOfDates: List[DateTime]): Unit = {
 
@@ -35,8 +39,7 @@ class DataSteps(spark: SparkSession) {
     }
 
 
-    // Per date
-    val featuresSteps = new FeaturesSteps(spark)
+    // Per time period: month
     listOfDates.par.foreach { dateTime =>
 
       println("Starting: " + dateTime.toString(interfaceVariables.dateTimePattern))
@@ -52,9 +55,17 @@ class DataSteps(spark: SparkSession) {
       // Hence
       if (unload.isSuccess) {
 
+        // Read-in the records of a month
         val records: DataFrame = spark.read.schema(schema).json(fileString)
 
-        featuresSteps.featuresSteps(records, dateTime.toString("yyyyMM"))
+        // Structure
+        val minimal: DataFrame = features.features(records, dateTime.toString("yyyyMM"))
+
+        // The journey duration distributions for each day of the month
+        val points: Array[candlePercentiles.Candle] = candlePercentiles.candlePercentiles(records = minimal,
+          partition = "start_epoch", field = "duration")
+
+        points.foreach(println(_))
 
       }
 
