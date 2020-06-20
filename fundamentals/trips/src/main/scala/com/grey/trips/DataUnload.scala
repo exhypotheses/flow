@@ -3,6 +3,7 @@ package com.grey.trips
 import java.io.File
 import java.net.URL
 
+import com.grey.directories.DataDirectories
 import com.grey.net.IsExistURL
 import org.joda.time.DateTime
 
@@ -15,7 +16,7 @@ class DataUnload {
 
   private val interfaceVariables = new InterfaceVariables()
   private val isExistURL = new IsExistURL()
-  private val appDirectories = new AppDirectories()
+  private val appDirectories = new DataDirectories()
 
 
   def dataUnload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
