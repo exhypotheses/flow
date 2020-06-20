@@ -1,14 +1,29 @@
-package com.grey.flow
+package com.grey.trips
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
+import org.joda.time.DateTime
 
-object App {
+import scala.util.Try
+import scala.util.control.Exception
+
+object TripsApp {
 
   private val localSettings = new LocalSettings()
-
+  private val dataTimes = new DataTimes()
 
   def main(args: Array[String]): Unit = {
+
+
+    // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
+    // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
+    val listOfDates: Try[List[DateTime]] = Exception.allCatch.withTry(
+      dataTimes.dataTimes()
+    )
+    if (listOfDates.isFailure) {
+      sys.error(listOfDates.failed.get.getMessage)
+    }
+
 
     // Minimise Spark & Logger Information Outputs
     Logger.getLogger("org").setLevel(Level.OFF)
@@ -17,9 +32,9 @@ object App {
 
     // Spark Session Instance
     // .config("spark.master", "local")
-    val spark: SparkSession = SparkSession.builder().appName("networks")
+    val spark: SparkSession = SparkSession.builder().appName("trips")
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      .config("spark.master", "local")
+      .config("spark.master", "local[*]")
       .getOrCreate()
 
 
@@ -48,21 +63,15 @@ object App {
 
     // Prepare local directories
     val appDirectories = new AppDirectories()
-    val dataDir = appDirectories.localDirectories(localSettings.dataDirectory)
-    val warehouseDir = appDirectories.localDirectories(localSettings.warehouseDirectory)
+    val dataDir = appDirectories.localDirectoryReset(localSettings.dataDirectory)
+    val warehouseDir = appDirectories.localDirectoryReset(localSettings.warehouseDirectory)
 
     if (dataDir.isSuccess && warehouseDir.isSuccess) {
       val dataSteps = new DataSteps(spark)
-      dataSteps.dataSteps()
+      dataSteps.dataSteps(listOfDates.get)
     } else {
       sys.error("Unable to set-up local directories")
     }
-
-
-
-
-
-
 
   }
 
