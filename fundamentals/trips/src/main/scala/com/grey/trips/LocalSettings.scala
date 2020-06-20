@@ -1,4 +1,4 @@
-package com.grey.flow
+package com.grey.trips
 
 class LocalSettings {
 
