@@ -1,4 +1,4 @@
-package com.grey.flow
+package com.grey.trips
 
 class InterfaceVariables {
 
@@ -10,5 +10,9 @@ class InterfaceVariables {
 
   // api.format(dateTimePattern)
   val api = "https://data.urbansharing.com/edinburghcyclehire.com/trips/v1/%s.json"
+
+  // https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+  val sourceTimeStamp = "yyyy-MM-dd HH:mm:ss.SSSXXX"
+  val projectTimeStamp = "yyyy-MM-dd HH:mm:ss.SSS"
 
 }
