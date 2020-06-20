@@ -1,4 +1,4 @@
-package com.grey.trips
+package com.grey.directories
 
 import java.io.File
 
@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils
 import scala.util.Try
 import scala.util.control.Exception
 
-class AppDirectories {
+class DataDirectories {
   
   def localDirectoryReset(directoryName: String): Try[Boolean] = {
 
