@@ -1,4 +1,4 @@
-package com.grey.flow
+package com.grey.directories
 
 import java.io.File
 
@@ -7,9 +7,9 @@ import org.apache.commons.io.FileUtils
 import scala.util.Try
 import scala.util.control.Exception
 
-class AppDirectories {
+class DataDirectories {
   
-  def localDirectories(directoryName: String): Try[Boolean] = {
+  def localDirectoryReset(directoryName: String): Try[Boolean] = {
 
     val directoryObject = new File(directoryName)
 

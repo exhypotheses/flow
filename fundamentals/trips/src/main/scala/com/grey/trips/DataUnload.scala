@@ -1,8 +1,10 @@
-package com.grey.flow
+package com.grey.trips
 
 import java.io.File
 import java.net.URL
 
+import com.grey.directories.DataDirectories
+import com.grey.net.IsExistURL
 import org.joda.time.DateTime
 
 import scala.language.postfixOps
@@ -13,11 +15,11 @@ import scala.util.control.Exception
 class DataUnload {
 
   private val interfaceVariables = new InterfaceVariables()
-  private val localSettings = new LocalSettings()
   private val isExistURL = new IsExistURL()
-  private val appDirectories = new AppDirectories()
+  private val appDirectories = new DataDirectories()
 
-  def dataUnload(dateTime: DateTime, directoryName: String): Try[String] = {
+
+  def dataUnload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
 
     // The application programming interface's URL for a data set of interest
     val url: String = interfaceVariables.api.format(dateTime.toString(interfaceVariables.dateTimePattern))
@@ -29,7 +31,7 @@ class DataUnload {
     val unload: Try[String] = if (isURL.isSuccess) {
       appDirectories.localDirectoryCreate(directoryName = directoryName)
       Exception.allCatch.withTry(
-        new URL(url) #> new File(directoryName + localSettings.localSeparator + dateTime.toString("MM") + ".json") !!
+        new URL(url) #> new File(fileString) !!
       )
     } else {
       sys.error(isURL.failed.get.getMessage)

@@ -4,7 +4,7 @@
     {
       "name": "started_at",
       "type": "string",
-      "nullable": true,
+      "nullable": false,
       "metadata":
       {
         "comment": "Ride starting time"
@@ -31,7 +31,7 @@
     {
       "name": "start_station_id",
       "type": "string",
-      "nullable": true,
+      "nullable": false,
       "metadata":
       {
         "comment": "The identification code of the starting station"
@@ -40,7 +40,7 @@
     {
       "name": "start_station_name",
       "type": "string",
-      "nullable": true,
+      "nullable": false,
       "metadata":
       {
         "comment": "The name of the starting station"
@@ -49,7 +49,7 @@
     {
       "name": "start_station_description",
       "type": "string",
-      "nullable": true,
+      "nullable": false,
       "metadata":
       {
         "comment": "The name of the starting station"
@@ -58,7 +58,7 @@
     {
       "name": "start_station_latitude",
       "type": "double",
-      "nullable": true,
+      "nullable": false,
       "metadata":
       {
         "comment": "The starting station latitude"
@@ -67,7 +67,7 @@
     {
       "name": "start_station_longitude",
       "type": "double",
-      "nullable": true,
+      "nullable": false,
       "metadata":
       {
         "comment": "The starting station longitude"
