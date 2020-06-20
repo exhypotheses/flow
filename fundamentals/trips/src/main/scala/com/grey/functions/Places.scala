@@ -1,17 +1,17 @@
-package com.grey.features
+package com.grey.functions
 
 import org.apache.spark.sql.functions.lower
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.parallel.immutable.ParSeq
 
-class FeaturesPlaces(spark: SparkSession) {
+class Places(spark: SparkSession) {
   /*
     The aim herein is to determine and record distinct station names, and hence build a
     library of station names
    */
 
-  def featuresPlaces(frame: DataFrame): Unit = {
+  def places(frame: DataFrame): Unit = {
 
     import spark.implicits._
 
@@ -20,7 +20,7 @@ class FeaturesPlaces(spark: SparkSession) {
       "station_latitude", "station_longitude")
 
     // Fields of interest
-    val placeNamesSeq: ParSeq[DataFrame] = List("start", "end").par.map{ prefix =>
+    val placeNamesSeq: ParSeq[DataFrame] = List("start", "end").par.map { prefix =>
 
       // The prefixed names and their un-prefixed counterparts
       val fields: List[(String, String)] = keys.map(suffix => (prefix + "_" + suffix, suffix))
@@ -29,7 +29,7 @@ class FeaturesPlaces(spark: SparkSession) {
       var dataset = frame.selectExpr(fields.map(x => x._1): _*).distinct()
 
       // Rename each field to its un-prefixed counterpart
-      fields.foreach{ field =>
+      fields.foreach { field =>
         dataset = dataset.withColumnRenamed(field._1, field._2)
       }
 
@@ -40,12 +40,9 @@ class FeaturesPlaces(spark: SparkSession) {
     // Reduce
     val placeNames: DataFrame = placeNamesSeq.reduce(_ union _)
 
-    val places = placeNames.select($"station_id", lower($"station_name").as("station_name"),
-        lower($"station_description").as("station_description"),
-        $"station_latitude", $"station_longitude").distinct()
-
-    places.show(33)
-
+    placeNames.select($"station_id", lower($"station_name").as("station_name"),
+      lower($"station_description").as("station_description"),
+      $"station_latitude", $"station_longitude").distinct()
 
 
   }
