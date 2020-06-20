@@ -3,6 +3,8 @@
 *.metal
 *.jar
 
+*data/
+
 
 classes/
 generated-sources/
