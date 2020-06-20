@@ -1,10 +1,10 @@
-package com.grey.flow
+package com.grey.trips
 
 import java.nio.file.Paths
 
-import com.grey.time.{TimeConstraints, TimeFormat, TimeSeries}
+import com.grey.features.FeaturesSteps
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
 
@@ -18,51 +18,45 @@ class DataSteps(spark: SparkSession) {
   private val interfaceVariables = new InterfaceVariables()
   private val dataUnload = new DataUnload()
 
-  def dataSteps(): Unit = {
+  def dataSteps(listOfDates: List[DateTime]): Unit = {
+
 
     // The schema of the data in question
     val schemaProperties: Try[RDD[String]] = Exception.allCatch.withTry(
       spark.sparkContext.textFile(localSettings.resourcesDirectory + "schemaOfSource.json")
     )
 
+
+    // The StructType form of the schema
     val schema: StructType = if (schemaProperties.isSuccess) {
       DataType.fromJson(schemaProperties.get.collect.mkString("")).asInstanceOf[StructType]
     } else {
       sys.error(schemaProperties.failed.get.getMessage)
     }
 
-    // The start/from & end/until dates of the data of interest
-    val timeFormat = new TimeFormat(interfaceVariables.dateTimePattern)
-    val from: DateTime = timeFormat.timeFormat(interfaceVariables.startDate)
-    val until: DateTime = timeFormat.timeFormat(interfaceVariables.endDate)
 
-    // Is from prior to until?
-    val timeConstraints = new TimeConstraints()
-    val sequentialTimes = timeConstraints.sequentialTimes(from = from, until = until)
-
-    // List of dates
-    val listOfDates: List[DateTime] = if (sequentialTimes) {
-      val timeSeries = new TimeSeries()
-      timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType)
-    } else {
-      sys.error("The start date must precede the end date")
-    }
-
-
+    // Per date
+    val featuresSteps = new FeaturesSteps(spark)
     listOfDates.par.foreach { dateTime =>
 
       println("Starting: " + dateTime.toString(interfaceVariables.dateTimePattern))
 
+      // The directory into which the data of the data in question should be deposited, directoryName, and
+      // the name to assign to the data file, fileString.  Note that fileString includes the path name.
       val directoryName: String = Paths.get(localSettings.dataDirectory, dateTime.toString("yyyy")).toString
       val fileString = directoryName + localSettings.localSeparator + dateTime.toString("MM") + ".json"
 
-      val unload = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName)
+      // Unload the data
+      val unload = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
 
+      // Hence
       if (unload.isSuccess) {
-        val records = spark.read.schema(schema).json(fileString)
-        records.show()
-      }
 
+        val records: DataFrame = spark.read.schema(schema).json(fileString)
+
+        featuresSteps.featuresSteps(records, dateTime.toString("yyyyMM"))
+
+      }
 
     }
 
