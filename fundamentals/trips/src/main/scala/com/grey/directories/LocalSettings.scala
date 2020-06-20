@@ -1,4 +1,4 @@
-package com.grey.trips
+package com.grey.directories
 
 class LocalSettings {
 
