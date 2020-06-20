@@ -1,5 +1,7 @@
-package com.grey.trips
+package com.grey
 
+import com.grey.directories.{DataDirectories, LocalSettings}
+import com.grey.trips.DataTimes
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
@@ -62,7 +64,7 @@ object TripsApp {
 
 
     // Prepare local directories
-    val appDirectories = new AppDirectories()
+    val appDirectories = new DataDirectories()
     val dataDir = appDirectories.localDirectoryReset(localSettings.dataDirectory)
     val warehouseDir = appDirectories.localDirectoryReset(localSettings.warehouseDirectory)
 
