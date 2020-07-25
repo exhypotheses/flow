@@ -1,4 +1,4 @@
-package com.grey.time
+package com.grey.trips.time
 
 import org.joda.time.DateTime
 
@@ -10,6 +10,7 @@ class TimeSeries {
       case "days" =>
         Iterator.iterate(from)( x => x.plusDays(step)).takeWhile(x => !x.isAfter(until) )
       case "months" =>
+
         Iterator.iterate(from)( x => x.plusMonths(step)).takeWhile(x => !x.isAfter(until) )
       case _ =>
         sys.error("Unknown Step Type")
