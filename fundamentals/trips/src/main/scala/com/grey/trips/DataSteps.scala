@@ -1,17 +1,13 @@
 package com.grey.trips
 
-import java.nio.file.Paths
-
 import com.grey.trips.environment.LocalSettings
-import com.grey.trips.features.{FeaturesData, FeaturesInterface}
+import com.grey.trips.features.FeaturesInterface
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
-import com.grey.trips.specific.DataUnload
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
 
-import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 import scala.util.control.Exception
 
@@ -46,18 +42,26 @@ class DataSteps(spark: SparkSession) {
     hiveBaseSettings.hiveBaseSettings(hiveBaseProperties)
 
 
-    // F
+    // Features Engineering
     val features: Try[Unit] = featuresInterface.featuresInterface(listOfDates = listOfDates, schema = schema)
 
 
-    // Hence
+    // Inspect
     if (features.isSuccess) {
       spark.sql("use flow")
-      println(spark.sql("select distinct start_date from trips order by start_date limit 100")
-        .show(100))
+      println(spark.sql("select distinct start_date from trips").show(180))
+      println(spark.sql("select count(*) as instances from trips").show())
     } else {
       sys.error(features.failed.get.getMessage)
     }
+
+
+    // Candle Sticks
+    // Each day illustrate the latest riding time distributions
+
+
+    // Daily Graph Networks & Metrics
+    // For: in-flows & out-flows, busy periods, demand forecasts, data integration, key bird-flies-routes
 
 
   }
