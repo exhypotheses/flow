@@ -1,8 +1,8 @@
-package com.grey.functions
+package com.grey.trips.functions
 
 import java.io.{File, PrintWriter}
 
-import com.grey.directories.LocalSettings
+import com.grey.trips.environment.LocalSettings
 
 /**
   * Creates HighCharts candle sticks JSON files
