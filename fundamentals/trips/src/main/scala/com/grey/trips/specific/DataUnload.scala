@@ -1,10 +1,10 @@
-package com.grey.trips
+package com.grey.trips.specific
 
 import java.io.File
 import java.net.URL
 
-import com.grey.directories.DataDirectories
-import com.grey.net.IsExistURL
+import com.grey.trips.environment.DataDirectories
+import com.grey.trips.net.IsExistURL
 import org.joda.time.DateTime
 
 import scala.language.postfixOps
@@ -16,7 +16,7 @@ class DataUnload {
 
   private val interfaceVariables = new InterfaceVariables()
   private val isExistURL = new IsExistURL()
-  private val appDirectories = new DataDirectories()
+  private val dataDirectories = new DataDirectories()
 
 
   def dataUnload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
@@ -29,7 +29,7 @@ class DataUnload {
 
     // If yes, unload the data set, otherwise ...
     val unload: Try[String] = if (isURL.isSuccess) {
-      appDirectories.localDirectoryCreate(directoryName = directoryName)
+      dataDirectories.localDirectoryCreate(directoryName = directoryName)
       Exception.allCatch.withTry(
         new URL(url) #> new File(fileString) !!
       )
@@ -39,7 +39,7 @@ class DataUnload {
 
     // Finally
     if (unload.isSuccess) {
-      println("Successfully downloaded " + url)
+      println("Successfully unloaded " + url)
       unload
     } else {
       sys.error(unload.failed.get.getMessage)
