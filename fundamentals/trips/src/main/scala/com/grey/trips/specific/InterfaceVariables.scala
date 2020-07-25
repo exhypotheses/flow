@@ -3,8 +3,8 @@ package com.grey.trips.specific
 class InterfaceVariables {
 
   // In general
-  val startDate = "2018/09"
-  val endDate = "2018/11"
+  val startDate = "2018/12"
+  val endDate = "2019/02"
   val step = 1
   val stepType = "months"
   val dateTimePattern = "yyyy/MM"
