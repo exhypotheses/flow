@@ -1,4 +1,4 @@
-package com.grey.net
+package com.grey.trips.net
 
 import java.net.{HttpURLConnection, URL}
 

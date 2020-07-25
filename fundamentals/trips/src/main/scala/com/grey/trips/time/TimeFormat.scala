@@ -1,17 +1,18 @@
-package com.grey.time
+package com.grey.trips.time
 
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
+import scala.util.Try
 import scala.util.control.Exception
 
 class TimeFormat(dateTimePattern: String) {
 
   def timeFormat(dateString: String): DateTime = {
 
-    val dateTimeFormatter = DateTimeFormat.forPattern(dateTimePattern)
+    val dateTimeFormatter: DateTimeFormatter = DateTimeFormat.forPattern(dateTimePattern)
 
-    val isDate = Exception.allCatch.withTry(
+    val isDate: Try[DateTime] = Exception.allCatch.withTry(
       dateTimeFormatter.parseDateTime(dateString)
     )
 

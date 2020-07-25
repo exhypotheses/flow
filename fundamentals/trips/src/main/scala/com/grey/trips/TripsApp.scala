@@ -1,30 +1,25 @@
-package com.grey
+package com.grey.trips
 
-import com.grey.directories.{DataDirectories, LocalSettings}
-import com.grey.trips.DataTimes
+import com.grey.trips.environment.{ConfigParameters, DataDirectories, LocalSettings}
+import com.grey.trips.specific.DataTimes
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
 
+import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
-import scala.util.control.Exception
 
 object TripsApp {
 
   private val localSettings = new LocalSettings()
+  private val configParameters = new ConfigParameters()
   private val dataTimes = new DataTimes()
 
   def main(args: Array[String]): Unit = {
 
-
     // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
     // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
-    val listOfDates: Try[List[DateTime]] = Exception.allCatch.withTry(
-      dataTimes.dataTimes()
-    )
-    if (listOfDates.isFailure) {
-      sys.error(listOfDates.failed.get.getMessage)
-    }
+    val listOfDates: List[DateTime] = dataTimes.dataTimes()
 
 
     // Minimise Spark & Logger Information Outputs
@@ -33,9 +28,10 @@ object TripsApp {
 
 
     // Spark Session Instance
-    // .config("spark.master", "local")
     val spark: SparkSession = SparkSession.builder().appName("trips")
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .config("spark.sql.warehouse.dir", localSettings.databaseDirectory)
+      .enableHiveSupport()
       .config("spark.master", "local[*]")
       .getOrCreate()
 
@@ -44,18 +40,10 @@ object TripsApp {
     spark.sparkContext.setLogLevel("ERROR")
 
 
-    // Configurations Parameters
-    // Thus far a m4.2xLarge Master Node has been used. There are 16 cores available
-    val nShufflePartitions = 32
-    val nParallelism = 32
-
-
     // Configurations
-    // sql.shuffle.partitions: The number of shuffle partitions for joins & aggregation
-    // default.parallelism: The default number of partitions delivered after a transformation
     // spark.conf.set("spark.speculation", value = false)
-    spark.conf.set("spark.sql.shuffle.partitions", nShufflePartitions.toString)
-    spark.conf.set("spark.default.parallelism", nParallelism.toString)
+    spark.conf.set("spark.sql.shuffle.partitions", configParameters.nShufflePartitions.toString)
+    spark.conf.set("spark.default.parallelism", configParameters.nParallelism.toString)
     spark.conf.set("spark.kryoserializer.buffer.max", "2048m")
 
 
@@ -64,16 +52,20 @@ object TripsApp {
 
 
     // Prepare local directories
-    val appDirectories = new DataDirectories()
-    val dataDir = appDirectories.localDirectoryReset(localSettings.dataDirectory)
-    val warehouseDir = appDirectories.localDirectoryReset(localSettings.warehouseDirectory)
+    val dataDirectories = new DataDirectories()
+    val directories: ParSeq[Try[Boolean]] = List(localSettings.dataDirectory, localSettings.localWarehouse)
+      .par.map( directory => dataDirectories.localDirectoryReset(directory) )
 
-    if (dataDir.isSuccess && warehouseDir.isSuccess) {
+
+    // Hence
+    if (directories.head.isSuccess) {
       val dataSteps = new DataSteps(spark)
-      dataSteps.dataSteps(listOfDates.get)
+      dataSteps.dataSteps(listOfDates)
     } else {
-      sys.error("Unable to set-up local directories")
+      // Superfluous
+      sys.error(directories.head.failed.get.getMessage)
     }
+
 
   }
 

@@ -1,4 +1,4 @@
-package com.grey.time
+package com.grey.trips.time
 
 import org.joda.time.DateTime
 
@@ -9,10 +9,12 @@ class TimeConstraints {
 
   def sequentialTimes(from: DateTime, until: DateTime): Boolean = {
 
+    // Set-up from & until comparison
     val sequential: Try[Boolean] = Exception.allCatch.withTry(
       from.isBefore(until)
     )
 
+    // If comparable, ascertain 'from' precedes 'until'
     if (sequential.isSuccess) {
       if (sequential.get) sequential.get else sys.error("The start date must precede the end date")
     } else {

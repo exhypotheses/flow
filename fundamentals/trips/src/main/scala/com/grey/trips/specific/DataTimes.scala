@@ -1,7 +1,10 @@
-package com.grey.trips
+package com.grey.trips.specific
 
-import com.grey.time.{TimeConstraints, TimeFormat, TimeSeries}
+import com.grey.trips.time.{TimeConstraints, TimeFormat, TimeSeries}
 import org.joda.time.DateTime
+
+import scala.util.Try
+import scala.util.control.Exception
 
 class DataTimes {
 
@@ -16,17 +19,20 @@ class DataTimes {
 
     // Is from prior to until?
     val timeConstraints = new TimeConstraints()
-    val sequentialTimes = timeConstraints.sequentialTimes(from = from, until = until)
+    timeConstraints.sequentialTimes(from = from, until = until)
 
     // List of dates
-    val listOfDates: List[DateTime] = if (sequentialTimes) {
-      val timeSeries = new TimeSeries()
+    val timeSeries = new TimeSeries()
+    val listOfDates: Try[List[DateTime]] = Exception.allCatch.withTry(
       timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType)
+    )
+
+    if (listOfDates.isSuccess){
+      listOfDates.get.distinct
     } else {
-      sys.error("The start date must precede the end date")
+      sys.error(listOfDates.failed.get.getMessage)
     }
 
-    listOfDates
 
   }
 
