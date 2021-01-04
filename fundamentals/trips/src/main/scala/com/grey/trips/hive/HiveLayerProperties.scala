@@ -2,8 +2,8 @@ package com.grey.trips.hive
 
 import java.sql.Date
 
+import com.grey.libraries.HiveLayerCaseClass
 import com.grey.trips.environment.ConfigParameters
-import com.grey.libraries.hive.HiveLayerCaseClass
 
 
 class HiveLayerProperties {
