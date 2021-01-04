@@ -1,7 +1,7 @@
 package com.grey.trips.hive
 
+import com.grey.libraries.{HiveBase, HiveBaseCaseClass}
 import com.grey.trips.environment.LocalSettings
-import com.grey.libraries.hive._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.{DataFrame, SparkSession}

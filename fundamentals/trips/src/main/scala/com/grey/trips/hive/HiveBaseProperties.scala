@@ -1,7 +1,7 @@
 package com.grey.trips.hive
 
+import com.grey.libraries.HiveBaseCaseClass
 import com.grey.trips.environment.{ConfigParameters, LocalSettings}
-import com.grey.libraries.hive.HiveBaseCaseClass
 
 class HiveBaseProperties {
 
