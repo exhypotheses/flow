@@ -3,9 +3,9 @@ package com.grey.trips.hive
 import java.nio.file.Path
 import java.sql.Date
 
+import com.grey.libraries.{ClearUp, HiveBaseCaseClass, HiveLayer, HiveLayerCaseClass}
 import com.grey.trips.environment.DataDirectories
 import com.grey.trips.functions.DataReset
-import com.grey.libraries.hive.{ClearUp, HiveBaseCaseClass, HiveLayer, HiveLayerCaseClass}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.parallel.mutable.ParArray
