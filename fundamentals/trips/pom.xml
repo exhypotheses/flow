@@ -77,7 +77,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.grey.libraries.hive</groupId>
+            <groupId>com.grey.libraries</groupId>
             <artifactId>hive</artifactId>
             <version>1.0</version>
         </dependency>
