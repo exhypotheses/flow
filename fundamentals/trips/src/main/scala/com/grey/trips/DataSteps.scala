@@ -50,7 +50,7 @@ class DataSteps(spark: SparkSession) {
     if (features.isSuccess) {
       spark.sql("use flow")
       println(spark.sql("select distinct start_date from trips").show(180))
-      println(spark.sql("select count(*) as instances from trips").show())
+      println(spark.sql("select distinct start_date from trips").count())
     } else {
       sys.error(features.failed.get.getMessage)
     }
