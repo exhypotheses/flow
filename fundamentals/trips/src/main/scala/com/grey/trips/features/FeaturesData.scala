@@ -2,7 +2,7 @@ package com.grey.trips.features
 
 import java.sql.Date
 
-import com.grey.trips.environment.{ConfigParameters, LocalSettings}
+import com.grey.trips.environment.{ConfigParameters, DataDirectories, LocalSettings}
 import com.grey.trips.functions.DataWrite
 import com.grey.trips.hive.{HiveBaseProperties, HiveLayerSettings}
 import org.apache.spark.sql._
@@ -17,6 +17,7 @@ class FeaturesData(spark: SparkSession) {
 
   private val configParameters = new ConfigParameters()
   private val localSettings = new LocalSettings()
+  private val dataDirectories = new DataDirectories()
 
   private val hiveBaseProperties = new HiveBaseProperties().hiveBaseProperties
   private val hiveLayerSettings = new HiveLayerSettings(spark, hiveBaseProperties)
