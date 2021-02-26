@@ -5,6 +5,7 @@ import java.net.URL
 
 import com.grey.trips.environment.DataDirectories
 import com.grey.trips.net.IsExistURL
+import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
 
 import scala.language.postfixOps
@@ -12,9 +13,9 @@ import scala.sys.process._
 import scala.util.Try
 import scala.util.control.Exception
 
-class DataUnload {
+class DataUnload(spark: SparkSession) {
 
-  private val interfaceVariables = new InterfaceVariables()
+  private val interfaceVariables = new InterfaceVariables(spark = spark)
   private val isExistURL = new IsExistURL()
   private val dataDirectories = new DataDirectories()
 
