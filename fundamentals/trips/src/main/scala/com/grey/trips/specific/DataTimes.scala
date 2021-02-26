@@ -8,9 +8,7 @@ import scala.util.control.Exception
 
 class DataTimes {
 
-  private val interfaceVariables = new InterfaceVariables()
-
-  def dataTimes(): List[DateTime] = {
+  def dataTimes(interfaceVariables: InterfaceVariables): List[DateTime] = {
 
     // The start/from & end/until dates of the data of interest
     val timeFormat = new TimeFormat(interfaceVariables.dateTimePattern)
