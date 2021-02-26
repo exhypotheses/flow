@@ -1,7 +1,7 @@
 package com.grey.trips
 
 import com.grey.trips.environment.{ConfigParameters, DataDirectories, LocalSettings}
-import com.grey.trips.specific.DataTimes
+import com.grey.trips.specific.{DataTimes, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
@@ -17,9 +17,7 @@ object TripsApp {
 
   def main(args: Array[String]): Unit = {
 
-    // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
-    // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
-    val listOfDates: List[DateTime] = dataTimes.dataTimes()
+
 
 
     // Minimise Spark & Logger Information Outputs
@@ -48,7 +46,7 @@ object TripsApp {
 
 
     // Graphs Model Checkpoint Directory
-    spark.sparkContext.setCheckpointDir("/tmp")
+    // spark.sparkContext.setCheckpointDir("/tmp")
 
 
     // Prepare local directories
@@ -57,10 +55,17 @@ object TripsApp {
       .par.map( directory => dataDirectories.localDirectoryReset(directory) )
 
 
+    // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
+    // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
+    val interfaceVariables: InterfaceVariables = new InterfaceVariables(spark)
+    val listOfDates: List[DateTime] = dataTimes.dataTimes(interfaceVariables = interfaceVariables)
+    listOfDates.foreach(println(_))
+
+
     // Hence
     if (directories.head.isSuccess) {
       val dataSteps = new DataSteps(spark)
-      dataSteps.dataSteps(listOfDates)
+      // dataSteps.dataSteps(listOfDates)
     } else {
       // Superfluous
       sys.error(directories.head.failed.get.getMessage)

@@ -11,7 +11,7 @@ class TimeConstraints {
 
     // Set-up from & until comparison
     val sequential: Try[Boolean] = Exception.allCatch.withTry(
-      from.isBefore(until)
+      from.isBefore(until) || from.isEqual(until)
     )
 
     // If comparable, ascertain 'from' precedes 'until'

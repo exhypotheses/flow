@@ -15,11 +15,11 @@ import scala.util.Try
 class FeaturesInterface(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
-  private val dataUnload = new DataUnload()
+  private val dataUnload = new DataUnload(spark = spark)
   private val featuresData = new FeaturesData(spark)
 
   private val projectTimeStamp: Column => Column = (x: Column) =>
-    to_timestamp(trim(x).substr(0, new InterfaceVariables().projectTimeStamp.length))
+    to_timestamp(trim(x).substr(0, new InterfaceVariables(spark).projectTimeStamp.length))
 
 
   def featuresInterface(listOfDates: List[DateTime], schema: StructType): Try[Unit] = {
