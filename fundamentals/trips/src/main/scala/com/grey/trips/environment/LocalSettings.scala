@@ -18,12 +18,14 @@ class LocalSettings {
   // Hive Database
   val base: String = "database"
   val database: String = "flow"
-  val databaseDirectory: String = s"/$base/$database"
+
 
   // These variables point to the same directory but their conventions differ
   val table: String = "trips"
-  val tableDirectory: String = "file:///J:" + databaseDirectory + s"/$table/"
-  val warehouseDirectory: String = Paths.get(localDirectory).getRoot.toString + localSeparator + base +
+  val databaseDirectory: String = "file:///Q:" + s"/$base/$database"
+  val tableDirectory: String = databaseDirectory + s"/$table/"
+
+  val warehouseDirectory: String = "Q:" + localSeparator + base +
     localSeparator + database + localSeparator + table + localSeparator
 
 
