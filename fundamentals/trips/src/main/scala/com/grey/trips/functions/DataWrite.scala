@@ -11,10 +11,12 @@ import scala.util.control.Exception
 
 class DataWrite(spark: SparkSession) {
 
-  private val interfaceVariables = new InterfaceVariables()
+  private val interfaceVariables = new InterfaceVariables(spark)
   private val fieldsOfInterest: Array[String] = new HiveBaseSettings(spark).fieldsOfInterest
 
   def dataWrite(daily: Dataset[Row], date: Date, src: String): Try[Unit] = {
+
+    println(daily.show(5))
 
     // Beware of time stamps, e.g., "yyyy-MM-dd HH:mm:ss.SSSXXXZ"
     val write: Try[Unit] = Exception.allCatch.withTry(
