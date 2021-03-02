@@ -3,13 +3,13 @@ package com.grey.trips.hive
 import java.sql.Date
 
 import com.grey.libraries.HiveLayerCaseClass
-import com.grey.trips.environment.ConfigParameters
+import com.grey.trips.environment.ConfigurationParameters
 
 
 class HiveLayerProperties {
 
 
-  private val configParameters = new ConfigParameters()
+  private val configParameters = new ConfigurationParameters()
 
 
   def hiveLayerProperties(date: Date, partition: String): HiveLayerCaseClass#HLCC = {
