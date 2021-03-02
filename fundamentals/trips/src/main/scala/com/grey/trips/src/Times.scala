@@ -1,4 +1,4 @@
-package com.grey.trips.specific
+package com.grey.trips.src
 
 import com.grey.trips.time.{TimeConstraints, TimeFormat, TimeSeries}
 import org.joda.time.DateTime
@@ -6,9 +6,9 @@ import org.joda.time.DateTime
 import scala.util.Try
 import scala.util.control.Exception
 
-class DataTimes {
+class Times {
 
-  def dataTimes(interfaceVariables: InterfaceVariables): List[DateTime] = {
+  def times(interfaceVariables: InterfaceVariables): List[DateTime] = {
 
     // The start/from & end/until dates of the data of interest
     val timeFormat = new TimeFormat(interfaceVariables.dateTimePattern)
