@@ -1,4 +1,4 @@
-package com.grey.trips.specific
+package com.grey.trips.src
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
@@ -37,7 +37,7 @@ class InterfaceVariables(spark: SparkSession) {
   // Ending
   private val dateTimeNow: DateTime = DateTime.now
   private val monthLimitString: String = DateTimeFormat.forPattern(dateTimePattern).print(dateTimeNow)
-  val endDate: String = monthLimitString // "2019/04"
+  val endDate: String = "2019/05" // monthLimitString
 
 
   // Starting
