@@ -1,6 +1,6 @@
 package com.grey.trips.environment
 
-class ConfigParameters {
+class ConfigurationParameters {
 
   // Spark Configurations Parameters
   // If

@@ -1,4 +1,4 @@
-package com.grey.trips.specific
+package com.grey.trips.src
 
 import java.io.File
 import java.net.URL
@@ -13,14 +13,14 @@ import scala.sys.process._
 import scala.util.Try
 import scala.util.control.Exception
 
-class DataUnload(spark: SparkSession) {
+class Unload(spark: SparkSession) {
 
   private val interfaceVariables = new InterfaceVariables(spark = spark)
   private val isExistURL = new IsExistURL()
   private val dataDirectories = new DataDirectories()
 
 
-  def dataUnload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
+  def unload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
 
     // The application programming interface's URL for a data set of interest
     val url: String = interfaceVariables.api.format(dateTime.toString(interfaceVariables.dateTimePattern))
@@ -29,7 +29,7 @@ class DataUnload(spark: SparkSession) {
     val isURL: Try[Boolean]  = isExistURL.isExistURL(url)
 
     // If yes, unload the data set, otherwise ...
-    val unload: Try[String] = if (isURL.isSuccess) {
+    val data: Try[String] = if (isURL.isSuccess) {
       dataDirectories.localDirectoryCreate(directoryName = directoryName)
       Exception.allCatch.withTry(
         new URL(url) #> new File(fileString) !!
@@ -39,11 +39,11 @@ class DataUnload(spark: SparkSession) {
     }
 
     // Finally
-    if (unload.isSuccess) {
+    if (data.isSuccess) {
       println("Successfully unloaded " + url)
-      unload
+      data
     } else {
-      sys.error(unload.failed.get.getMessage)
+      sys.error(data.failed.get.getMessage)
     }
 
   }

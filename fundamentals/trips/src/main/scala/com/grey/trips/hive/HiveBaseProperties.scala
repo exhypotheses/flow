@@ -1,12 +1,12 @@
 package com.grey.trips.hive
 
 import com.grey.libraries.HiveBaseCaseClass
-import com.grey.trips.environment.{ConfigParameters, LocalSettings}
+import com.grey.trips.environment.{ConfigurationParameters, LocalSettings}
 
 class HiveBaseProperties {
 
   private val localSettings = new LocalSettings()
-  private val configParameters = new ConfigParameters()
+  private val configurationParameters = new ConfigurationParameters()
 
   def hiveBaseProperties: HiveBaseCaseClass#HBCC = {
 
@@ -32,7 +32,7 @@ class HiveBaseProperties {
 
 
     // Table: Partitioning
-    val partitionVariables: Map[String, String] = configParameters.partitionVariables
+    val partitionVariables: Map[String, String] = configurationParameters.partitionVariables
 
 
     // Case -> CREATE TABLE
@@ -43,7 +43,7 @@ class HiveBaseProperties {
 
     // Clustering, Sorting, Bucketing
     val bucketVariables: Map[String, String] = Map("clusterBy" -> "start_station_id",
-      "sortBy" -> "start_station_id, started_at", "numberOfBuckets" -> configParameters.nParallelism.toString)
+      "sortBy" -> "start_station_id, started_at", "numberOfBuckets" -> configurationParameters.nParallelism.toString)
 
     val bucketClause: String = s"CLUSTERED BY (${bucketVariables("clusterBy")}) " +
       s"SORTED BY (${bucketVariables("sortBy")}) INTO ${bucketVariables("numberOfBuckets")} BUCKETS"
