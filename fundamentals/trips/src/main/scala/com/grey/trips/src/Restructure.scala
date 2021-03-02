@@ -1,29 +1,28 @@
-package com.grey.trips.features
+package com.grey.trips.src
 
 import java.sql.Date
 
-import com.grey.trips.environment.{ConfigParameters, DataDirectories, LocalSettings}
-import com.grey.trips.functions.DataWrite
-import com.grey.trips.hive.{HiveBaseProperties, HiveLayerSettings}
+import com.grey.trips.environment.{ConfigurationParameters, LocalSettings}
+import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings, HiveLayerSettings}
 import org.apache.spark.sql._
 
 import scala.collection.parallel.mutable.ParArray
 import scala.util.Try
+import scala.util.control.Exception
 
 
-class FeaturesData(spark: SparkSession) {
+class Restructure(spark: SparkSession) {
 
-  private val dataWrite = new DataWrite(spark)
-
-  private val configParameters = new ConfigParameters()
+  private val configParameters = new ConfigurationParameters()
   private val localSettings = new LocalSettings()
-  private val dataDirectories = new DataDirectories()
 
+  private val interfaceVariables = new InterfaceVariables(spark)
+  private val fieldsOfInterest: Array[String] = new HiveBaseSettings(spark).fieldsOfInterest
   private val hiveBaseProperties = new HiveBaseProperties().hiveBaseProperties
   private val hiveLayerSettings = new HiveLayerSettings(spark, hiveBaseProperties)
 
 
-  def featuresData(minimal: DataFrame, name: String): Try[Unit] = {
+  def restructure(minimal: DataFrame, name: String): Try[Unit] = {
 
     // This import is required for (a) the $-notation, (b) implicit conversions such as converting a RDD
     // to a DataFrame, (c) encoders for [most] types, which are also automatically provided by
@@ -51,15 +50,22 @@ class FeaturesData(spark: SparkSession) {
       daily = daily.repartition(numPartitions = configParameters.nParallelism, partitionExprs = $"start_station_id")
         .sortWithinPartitions($"start_station_id", $"started_at")
 
-      // Write to file
-      val write = dataWrite.dataWrite(daily = daily, date = date, src = src)
+
+      // Beware of time stamps, e.g., "yyyy-MM-dd HH:mm:ss.SSSXXXZ"
+      val stream: Try[Unit] = Exception.allCatch.withTry(
+        daily.selectExpr(fieldsOfInterest: _*).write
+          .option("header", "false")
+          .option("encoding", "UTF-8")
+          .option("timestampFormat", interfaceVariables.projectTimeStamp)
+          .csv(src)
+      )
 
       // Hive
-      if (write.isSuccess) {
+      if (stream.isSuccess) {
         hiveLayerSettings.hiveLayerSettings(date = date, src = src, dst = dst, partition = partition)
       } else {
         // Superfluous
-        sys.error(write.failed.get.getMessage)
+        sys.error(stream.failed.get.getMessage)
       }
 
     }
