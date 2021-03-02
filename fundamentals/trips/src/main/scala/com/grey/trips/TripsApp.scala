@@ -1,7 +1,7 @@
 package com.grey.trips
 
-import com.grey.trips.environment.{ConfigParameters, DataDirectories, LocalSettings}
-import com.grey.trips.specific.{DataTimes, InterfaceVariables}
+import com.grey.trips.environment.{ConfigurationParameters, DataDirectories, LocalSettings}
+import com.grey.trips.src.{Times, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
@@ -12,13 +12,10 @@ import scala.util.Try
 object TripsApp {
 
   private val localSettings = new LocalSettings()
-  private val configParameters = new ConfigParameters()
-  private val dataTimes = new DataTimes()
+  private val configurationParameters = new ConfigurationParameters()
+  private val times = new Times()
 
   def main(args: Array[String]): Unit = {
-
-
-
 
     // Minimise Spark & Logger Information Outputs
     Logger.getLogger("org").setLevel(Level.OFF)
@@ -40,8 +37,8 @@ object TripsApp {
 
     // Configurations
     // spark.conf.set("spark.speculation", value = false)
-    spark.conf.set("spark.sql.shuffle.partitions", configParameters.nShufflePartitions.toString)
-    spark.conf.set("spark.default.parallelism", configParameters.nParallelism.toString)
+    spark.conf.set("spark.sql.shuffle.partitions", configurationParameters.nShufflePartitions.toString)
+    spark.conf.set("spark.default.parallelism", configurationParameters.nParallelism.toString)
     spark.conf.set("spark.kryoserializer.buffer.max", "2048m")
 
 
@@ -58,14 +55,14 @@ object TripsApp {
     // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
     // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
     val interfaceVariables: InterfaceVariables = new InterfaceVariables(spark)
-    val listOfDates: List[DateTime] = dataTimes.dataTimes(interfaceVariables = interfaceVariables)
+    val listOfDates: List[DateTime] = times.times(interfaceVariables = interfaceVariables)
     listOfDates.foreach(println(_))
 
 
     // Hence
     if (directories.head.isSuccess) {
       val dataSteps = new DataSteps(spark)
-      // dataSteps.dataSteps(listOfDates)
+      dataSteps.dataSteps(listOfDates)
     } else {
       // Superfluous
       sys.error(directories.head.failed.get.getMessage)
