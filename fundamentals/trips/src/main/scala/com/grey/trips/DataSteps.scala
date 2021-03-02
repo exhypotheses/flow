@@ -1,8 +1,8 @@
 package com.grey.trips
 
 import com.grey.trips.environment.LocalSettings
-import com.grey.trips.features.FeaturesInterface
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
+import com.grey.trips.src.Read
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
@@ -15,20 +15,16 @@ import scala.util.control.Exception
 class DataSteps(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
-
   private val hiveBaseProperties = new HiveBaseProperties().hiveBaseProperties
   private val hiveBaseSettings = new HiveBaseSettings(spark)
-
-  private val featuresInterface = new FeaturesInterface(spark)
+  private val read = new Read(spark)
 
   def dataSteps(listOfDates: List[DateTime]): Unit = {
-
 
     // The schema of the data in question
     val schemaProperties: Try[RDD[String]] = Exception.allCatch.withTry(
       spark.sparkContext.textFile(localSettings.resourcesDirectory + "schemaOfSource.json")
     )
-
 
     // The StructType form of the schema
     val schema: StructType = if (schemaProperties.isSuccess) {
@@ -37,13 +33,11 @@ class DataSteps(spark: SparkSession) {
       sys.error(schemaProperties.failed.get.getMessage)
     }
 
-
     // Ascertaining the existence of the database & data table of interest
     hiveBaseSettings.hiveBaseSettings(hiveBaseProperties)
 
-
     // Features Engineering
-    val features: Try[Unit] = featuresInterface.featuresInterface(listOfDates = listOfDates, schema = schema)
+    val features: Try[Unit] = read.read(listOfDates = listOfDates, schema = schema)
 
 
     // Inspect
@@ -55,13 +49,11 @@ class DataSteps(spark: SparkSession) {
       sys.error(features.failed.get.getMessage)
     }
 
-
-    // Candle Sticks
-    // Each day illustrate the latest riding time distributions
-
+    // Spreads
+    // Determine each day's riding time distributions; quantiles
 
     // Daily Graph Networks & Metrics
-    // For: in-flows & out-flows, busy periods, demand forecasts, data integration, key bird-flies-routes
+    // For: in-flows & out-flows, busy periods, demand forecasts, data integration, as-a-bird-flies analysis
 
 
   }
