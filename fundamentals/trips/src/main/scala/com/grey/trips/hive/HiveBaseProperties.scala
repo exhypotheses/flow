@@ -1,12 +1,12 @@
 package com.grey.trips.hive
 
 import com.grey.libraries.HiveBaseCaseClass
-import com.grey.trips.environment.{ConfigParameters, LocalSettings}
+import com.grey.trips.environment.{ConfigurationParameters, LocalSettings}
 
 class HiveBaseProperties {
 
   private val localSettings = new LocalSettings()
-  private val configParameters = new ConfigParameters()
+  private val configParameters = new ConfigurationParameters()
 
   def hiveBaseProperties: HiveBaseCaseClass#HBCC = {
 
