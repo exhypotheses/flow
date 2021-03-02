@@ -1,9 +1,8 @@
-package com.grey.trips.features
+package com.grey.trips.src
 
 import java.nio.file.Paths
 
 import com.grey.trips.environment.LocalSettings
-import com.grey.trips.specific.{DataUnload, InterfaceVariables}
 import org.apache.spark.sql.functions.{to_timestamp, trim, unix_timestamp}
 import org.apache.spark.sql.types.{DateType, StructType}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
@@ -12,17 +11,17 @@ import org.joda.time.DateTime
 import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 
-class FeaturesInterface(spark: SparkSession) {
+class Read(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
-  private val dataUnload = new DataUnload(spark = spark)
-  private val featuresData = new FeaturesData(spark)
+  private val unload = new Unload(spark = spark)
+  private val restructure = new Restructure(spark)
 
   private val projectTimeStamp: Column => Column = (x: Column) =>
     to_timestamp(trim(x).substr(0, new InterfaceVariables(spark).projectTimeStamp.length))
 
 
-  def featuresInterface(listOfDates: List[DateTime], schema: StructType): Try[Unit] = {
+  def read(listOfDates: List[DateTime], schema: StructType): Try[Unit] = {
 
 
     import spark.implicits._
@@ -39,11 +38,11 @@ class FeaturesInterface(spark: SparkSession) {
 
 
       // Unload the data
-      val unload = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
+      val data = unload.unload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
 
 
       // Hence
-      if (unload.isSuccess) {
+      if (data.isSuccess) {
 
         // Read-in the records of a month
         val records: DataFrame = spark.read.schema(schema).json(fileString)
@@ -67,10 +66,10 @@ class FeaturesInterface(spark: SparkSession) {
         minimal = minimal.withColumn("start_date_epoch", unix_timestamp($"start_date"))
 
         // Hence
-        featuresData.featuresData(minimal, dateTime.toString("yyyyMM"))
+        restructure.restructure(minimal, dateTime.toString("yyyyMM"))
 
       } else {
-        sys.error(unload.failed.get.getMessage)
+        sys.error(data.failed.get.getMessage)
       }
 
 
