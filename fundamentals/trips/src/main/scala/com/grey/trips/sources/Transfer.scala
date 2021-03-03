@@ -1,4 +1,4 @@
-package com.grey.trips.src
+package com.grey.trips.sources
 
 import java.io.File
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}

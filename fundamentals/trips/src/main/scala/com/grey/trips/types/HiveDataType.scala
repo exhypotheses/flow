@@ -1,8 +1,10 @@
-package com.grey.libraries.hive
+package com.grey.trips.types
 
 import org.apache.spark.sql.types._
 
-// From Spark 2.4.+ onward StructField.toDDL addresses type mapping
+/**
+  * From Spark 2.4.+ onward StructField.toDDL addresses type mapping
+  */
 class HiveDataType {
 
   def hiveDataType(dataTypeOfVariable: DataType): String = {
@@ -10,7 +12,7 @@ class HiveDataType {
     dataTypeOfVariable match {
 
       case _:ByteType => "tinyint"
-      case _:ShortType => "shortint"
+      case _:ShortType => "smallint"
       case _:IntegerType => "integer"
       case _:LongType => "bigint"
       case _:FloatType => "float"

@@ -1,4 +1,4 @@
-package com.grey.trips.src
+package com.grey.trips.sources
 
 import com.grey.trips.time.{TimeConstraints, TimeFormat, TimeSeries}
 import org.joda.time.DateTime
