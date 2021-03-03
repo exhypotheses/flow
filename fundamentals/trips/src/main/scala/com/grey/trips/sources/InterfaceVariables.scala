@@ -1,4 +1,4 @@
-package com.grey.trips.src
+package com.grey.trips.sources
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
@@ -41,14 +41,12 @@ class InterfaceVariables(spark: SparkSession) {
 
 
   // Starting
-  val isDatabase: Try[DataFrame] = Exception.allCatch.withTry(
+  private val isDatabase: Try[DataFrame] = Exception.allCatch.withTry(
     spark.sql("use flow")
   )
-
-  val isTable: Try[DataFrame] = Exception.allCatch.withTry(
+  private val isTable: Try[DataFrame] = Exception.allCatch.withTry(
     spark.sql("select date_format(max(start_date), 'yyyy/MM') as maximum from trips")
   )
-
   val startDate: String = if (isDatabase.isSuccess && isTable.isSuccess) {
     isTable.get.head().getAs[String]("maximum")
   } else {
