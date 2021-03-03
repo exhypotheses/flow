@@ -1,7 +1,7 @@
 package com.grey.trips
 
 import com.grey.trips.environment.{ConfigurationParameters, DataDirectories, LocalSettings}
-import com.grey.trips.src.{Times, InterfaceVariables}
+import com.grey.trips.sources.{Times, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
