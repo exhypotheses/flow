@@ -5,7 +5,7 @@ import java.sql.Date
 
 import com.grey.libraries.{ClearUp, HiveBaseCaseClass, HiveLayer, HiveLayerCaseClass}
 import com.grey.trips.environment.DataDirectories
-import com.grey.trips.src.Transfer
+import com.grey.trips.sources.Transfer
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.parallel.mutable.ParArray
