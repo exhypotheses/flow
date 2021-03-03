@@ -12,7 +12,7 @@ class HiveDataType {
     dataTypeOfVariable match {
 
       case _:ByteType => "tinyint"
-      case _:ShortType => "shortint"
+      case _:ShortType => "smallint"
       case _:IntegerType => "integer"
       case _:LongType => "bigint"
       case _:FloatType => "float"
