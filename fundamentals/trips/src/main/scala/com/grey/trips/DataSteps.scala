@@ -2,7 +2,7 @@ package com.grey.trips
 
 import com.grey.trips.environment.LocalSettings
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
-import com.grey.trips.src.Read
+import com.grey.trips.sources.Read
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
@@ -39,12 +39,12 @@ class DataSteps(spark: SparkSession) {
     // Features Engineering
     val features: Try[Unit] = read.read(listOfDates = listOfDates, schema = schema)
 
-
     // Inspect
     if (features.isSuccess) {
       spark.sql("use flow")
       println(spark.sql("select distinct start_date from trips").show(180))
       println(spark.sql("select distinct start_date from trips").count())
+      spark.sql("select * from trips limit 5").show()
     } else {
       sys.error(features.failed.get.getMessage)
     }
