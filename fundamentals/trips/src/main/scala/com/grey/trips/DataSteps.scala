@@ -61,7 +61,18 @@ class DataSteps(spark: SparkSession) {
       calculationField = "duration", fileName = "durationCandles")
 
 
+    // Next ...
+    // Finish CandleJSON
+    // It has to save files to 'warehouse'
+
+
+    // Next ...
+    // Rename com.grey.trips -> com.grey.rides
+
+
+    // Next ...
     // Daily Graph Networks & Metrics
+    // Within a different section ... com.grey.networks
     // For: in-flows & out-flows, busy periods, demand forecasts, data integration, as-a-bird-flies analysis
 
 
