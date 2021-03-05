@@ -1,11 +1,13 @@
 package com.grey.trips
 
 import com.grey.trips.environment.LocalSettings
+import com.grey.trips.functions.Quantiles
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
 import com.grey.trips.sources.{CaseClassOf, Read}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.storage.StorageLevel
 import org.joda.time.DateTime
 
 import scala.util.Try
@@ -20,6 +22,8 @@ class DataSteps(spark: SparkSession) {
   private val read = new Read(spark)
 
   def dataSteps(listOfDates: List[DateTime]): Unit = {
+
+    import spark.implicits._
 
     // The schema of the data in question
     val schemaProperties: Try[RDD[String]] = Exception.allCatch.withTry(
@@ -39,26 +43,36 @@ class DataSteps(spark: SparkSession) {
     // Features Engineering
     val features: Try[Unit] = read.read(listOfDates = listOfDates, schema = schema)
 
-    // Inspect
-    val sample: DataFrame = if (features.isSuccess) {
+    // Setting-up
+    val data: Dataset[Row] = if (features.isSuccess) {
       spark.sql("use flow")
-      println(spark.sql("select distinct start_date from trips").show(180))
-      println(spark.sql("select distinct start_date from trips").count())
-      spark.sql("select * from trips limit 500")
+      val data = spark.sql("select * from trips")
+      val caseClassOf = CaseClassOf.caseClassOf(schema = data.schema)
+      data.as(caseClassOf).select($"start_date_epoch", $"duration")
     } else {
       sys.error(features.failed.get.getMessage)
     }
-    sample.printSchema()
+    data.persist(StorageLevel.MEMORY_ONLY)
 
-    // Dataset[Row] format
-    val caseClassOf = CaseClassOf.caseClassOf(schema = sample.schema)
-    val sampleSet: Dataset[Row] = sample.as(caseClassOf)
-    sampleSet.show(5)
 
     // Spreads
     // Determine each day's riding time distributions; quantiles
+    new Quantiles(spark = spark).quantiles(partitioningField = "start_date_epoch",
+      calculationField = "duration", fileName = "durationCandles")
 
+
+    // Next ...
+    // Finish CandleJSON
+    // It has to save files to 'warehouse'
+
+
+    // Next ...
+    // Rename com.grey.trips -> com.grey.rides
+
+
+    // Next ...
     // Daily Graph Networks & Metrics
+    // Within a different section ... com.grey.networks
     // For: in-flows & out-flows, busy periods, demand forecasts, data integration, as-a-bird-flies analysis
 
 
