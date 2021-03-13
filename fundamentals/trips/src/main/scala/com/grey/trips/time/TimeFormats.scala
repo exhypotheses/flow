@@ -6,9 +6,18 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import scala.util.Try
 import scala.util.control.Exception
 
-class TimeFormat(dateTimePattern: String) {
+/**
+  *
+  * @param dateTimePattern: Expected date and/or time pattern
+  */
+class TimeFormats(dateTimePattern: String) {
 
-  def timeFormat(dateString: String): DateTime = {
+  /**
+    *
+    * @param dateString: A date and/or time string that will be verified
+    * @return
+    */
+  def timeFormats(dateString: String): DateTime = {
 
     val dateTimeFormatter: DateTimeFormatter = DateTimeFormat.forPattern(dateTimePattern)
 
