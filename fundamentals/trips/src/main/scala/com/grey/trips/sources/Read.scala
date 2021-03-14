@@ -18,7 +18,7 @@ class Read(spark: SparkSession) {
   private val restructure = new Restructure(spark)
 
   private val projectTimeStamp: Column => Column = (x: Column) =>
-    to_timestamp(trim(x).substr(0, new InterfaceVariables(spark).projectTimeStamp.length))
+    to_timestamp(trim(x).substr(0, localSettings.projectTimeStamp.length))
 
 
   def read(listOfDates: List[DateTime], schema: StructType): Try[Unit] = {
@@ -27,7 +27,7 @@ class Read(spark: SparkSession) {
     import spark.implicits._
 
 
-    // Per time period: The host stores the data in month files
+    // Per time period: The host stores the data as month files
     val instances: ParSeq[Try[Unit]] = listOfDates.par.map { dateTime =>
 
 
