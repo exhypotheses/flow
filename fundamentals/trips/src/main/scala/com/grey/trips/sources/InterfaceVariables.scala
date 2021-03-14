@@ -1,11 +1,16 @@
 package com.grey.trips.sources
 
+import java.io.File
+import java.nio.file.Paths
+
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.util.Try
 import scala.util.control.Exception
+import com.grey.trips.environment.LocalSettings
 
 
 /**
@@ -19,39 +24,45 @@ import scala.util.control.Exception
 class InterfaceVariables(spark: SparkSession) {
 
 
-  // In general, w.r.t. data origin
-  val step = 1
-  val stepType = "months"
-  val dateTimePattern = "yyyy/MM"
+  /**
+    * Path
+    */
+  private val localSettings = new LocalSettings()
+  private val path: String = Paths.get(localSettings.resourcesDirectory, "cycles.conf").toString
 
 
-  // Usage: api.format(dateTimePattern)
-  val api = "https://data.urbansharing.com/edinburghcyclehire.com/trips/v1/%s.json"
-
-
-  // Patterns
-  val projectTimeStamp = "yyyy-MM-dd HH:mm:ss.SSS"
-  val sourceTimeStamp = "yyyy-MM-dd HH:mm:ss.SSSXXXZ"
-
-
-  // Ending
-  private val dateTimeNow: DateTime = DateTime.now
-  private val monthLimitString: String = DateTimeFormat.forPattern(dateTimePattern).print(dateTimeNow)
-  val endDate: String = "2019/05" // monthLimitString
-
-
-  // Starting
-  private val isDatabase: Try[DataFrame] = Exception.allCatch.withTry(
-    spark.sql("use flow")
+  /**
+    * Read the configuration file
+    */
+  private val config: Try[Config] = Exception.allCatch.withTry(
+    ConfigFactory.parseFile(new File(path)).getConfig("variables")
   )
-  private val isTable: Try[DataFrame] = Exception.allCatch.withTry(
-    spark.sql("select date_format(max(start_date), 'yyyy/MM') as maximum from trips")
-  )
-  val startDate: String = if (isDatabase.isSuccess && isTable.isSuccess) {
-    isTable.get.head().getAs[String]("maximum")
-  } else {
-    "2018/12"
+  if (config.isFailure) {
+    sys.error(config.failed.get.getMessage)
   }
 
+
+  /**
+    * Query formula
+    */
+  val variable: (String, String) => String = (group: String, variable: String) => {
+    val text = Exception.allCatch.withTry(
+      config.get.getConfig(group).getString(variable)
+    )
+    if (text.isFailure) {
+      sys.error(text.failed.get.getMessage)
+    } else {
+      text.get
+    }
+  }
+
+
+  /**
+    * Set the variables
+    */
+  val step: Int = variable("times", "step").toInt
+  val stepType: String = variable("times", "stepType")
+  val dateTimePattern: String = variable("url", "dateTimePattern")
+  val api: String = variable("url", "api")
 
 }
