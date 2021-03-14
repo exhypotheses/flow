@@ -20,7 +20,7 @@ class CandleJSON {
     */
   def candleJSON(points: Array[Row], fileName: String): Unit = {
 
-    val fileObject = new PrintWriter(new File(localSettings.warehouseDirectory + fileName + ".json"))
+    val fileObject = new PrintWriter(new File(localSettings.tablePath + fileName + ".json"))
 
     // Starting
     fileObject.println("[")
