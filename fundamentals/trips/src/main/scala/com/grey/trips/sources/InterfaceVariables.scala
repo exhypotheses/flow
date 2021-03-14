@@ -3,9 +3,7 @@ package com.grey.trips.sources
 import java.io.File
 import java.nio.file.Paths
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
+import org.apache.spark.sql.SparkSession
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.util.Try
