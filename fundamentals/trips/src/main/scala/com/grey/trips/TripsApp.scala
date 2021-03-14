@@ -1,7 +1,8 @@
 package com.grey.trips
 
 import com.grey.trips.environment.{ConfigurationParameters, DataDirectories, LocalSettings}
-import com.grey.trips.sources.{Times, InterfaceVariables}
+import com.grey.trips.functions.Quantiles
+import com.grey.trips.sources.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
@@ -13,7 +14,7 @@ object TripsApp {
 
   private val localSettings = new LocalSettings()
   private val configurationParameters = new ConfigurationParameters()
-  private val times = new Times()
+
 
   def main(args: Array[String]): Unit = {
 
@@ -55,17 +56,31 @@ object TripsApp {
     // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
     // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
     val interfaceVariables: InterfaceVariables = new InterfaceVariables(spark)
-    val listOfDates: List[DateTime] = times.times(interfaceVariables = interfaceVariables)
+    val interfaceTimeSeries = new InterfaceTimeSeries(spark)
+    val listOfDates: List[DateTime] = interfaceTimeSeries.interfaceTimeSeries(interfaceVariables = interfaceVariables)
     listOfDates.foreach(println(_))
 
 
     // Hence
-    if (directories.head.isSuccess) {
+    val process: Try[Unit] = if (directories.head.isSuccess) {
       val dataSteps = new DataSteps(spark)
       dataSteps.dataSteps(listOfDates)
     } else {
       // Superfluous
       sys.error(directories.head.failed.get.getMessage)
+    }
+
+
+    // Spreads; determine each day's riding time distributions.
+    if (process.isSuccess) {
+
+      spark.sql(s"use ${localSettings.database}")
+
+      new Quantiles(spark = spark).quantiles(partitioningField = "start_date_epoch",
+        calculationField = "duration", fileName = "durationCandles")
+
+    } else {
+      sys.error(process.failed.get.getMessage)
     }
 
 

@@ -1,34 +1,46 @@
 package com.grey.trips
 
+import java.nio.file.Paths
+
 import com.grey.trips.environment.LocalSettings
-import com.grey.trips.functions.Quantiles
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
-import com.grey.trips.sources.{CaseClassOf, Read}
+import com.grey.trips.sources.{Read, Unload}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.apache.spark.storage.StorageLevel
 import org.joda.time.DateTime
 
+import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 import scala.util.control.Exception
 
 
+/**
+  *
+  * @param spark: A SparkSession instance
+  */
 class DataSteps(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
   private val hiveBaseProperties = new HiveBaseProperties().hiveBaseProperties
   private val hiveBaseSettings = new HiveBaseSettings(spark)
+
+  private val unload = new Unload(spark = spark)
   private val read = new Read(spark)
 
-  def dataSteps(listOfDates: List[DateTime]): Unit = {
 
-    import spark.implicits._
+  /**
+    *
+    * @param listOfDates : List of dates
+    */
+  def dataSteps(listOfDates: List[DateTime]): Try[Unit] = {
+
 
     // The schema of the data in question
     val schemaProperties: Try[RDD[String]] = Exception.allCatch.withTry(
       spark.sparkContext.textFile(localSettings.resourcesDirectory + "schemaOfSource.json")
     )
+
 
     // The StructType form of the schema
     val schema: StructType = if (schemaProperties.isSuccess) {
@@ -37,45 +49,34 @@ class DataSteps(spark: SparkSession) {
       sys.error(schemaProperties.failed.get.getMessage)
     }
 
+
     // Ascertaining the existence of the database & data table of interest
     hiveBaseSettings.hiveBaseSettings(hiveBaseProperties)
 
-    // Features Engineering
-    val features: Try[Unit] = read.read(listOfDates = listOfDates, schema = schema)
 
-    // Setting-up
-    val data: Dataset[Row] = if (features.isSuccess) {
-      spark.sql("use flow")
-      val data = spark.sql("select * from trips")
-      val caseClassOf = CaseClassOf.caseClassOf(schema = data.schema)
-      data.as(caseClassOf).select($"start_date_epoch", $"duration")
-    } else {
-      sys.error(features.failed.get.getMessage)
+    // Per time period: The host stores the data as month files
+    val instances: ParSeq[Try[Unit]] = listOfDates.par.map { dateTime =>
+
+      // The directory into which the data of the date in question should be deposited (directoryName) and
+      // the name to assign to the data file (fileString).  Note that fileString includes the path name.
+      val directoryName: String = Paths.get(localSettings.dataDirectory, dateTime.toString("yyyy")).toString
+      val fileString = directoryName + localSettings.localSeparator + dateTime.toString("MM") + ".json"
+
+      // Unload the data
+      val data = unload.unload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
+
+      // Hence
+      if (data.isSuccess) {
+        read.read(dateTime = dateTime, fileString = fileString, schema = schema)
+      } else {
+        sys.error(data.failed.get.getMessage)
+      }
+
     }
-    data.persist(StorageLevel.MEMORY_ONLY)
-
-
-    // Spreads
-    // Determine each day's riding time distributions; quantiles
-    new Quantiles(spark = spark).quantiles(partitioningField = "start_date_epoch",
-      calculationField = "duration", fileName = "durationCandles")
-
-
-    // Next ...
-    // Finish CandleJSON
-    // It has to save files to 'warehouse'
-
-
-    // Next ...
-    // Rename com.grey.trips -> com.grey.rides
-
-
-    // Next ...
-    // Daily Graph Networks & Metrics
-    // Within a different section ... com.grey.networks
-    // For: in-flows & out-flows, busy periods, demand forecasts, data integration, as-a-bird-flies analysis
+    instances.head
 
 
   }
+
 
 }

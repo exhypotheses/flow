@@ -1,6 +1,5 @@
 package com.grey.trips.environment
 
-import java.nio.file.Paths
 
 class LocalSettings {
 
@@ -15,6 +14,16 @@ class LocalSettings {
   val localWarehouse: String = s"$localDirectory${localSeparator}warehouse$localSeparator"
 
 
+  // Local data directories
+  val resourcesDirectory: String = s"$localDirectory${localSeparator}src" +
+    s"${localSeparator}main${localSeparator}resources$localSeparator"
+  val dataDirectory: String = s"$localDirectory${localSeparator}data$localSeparator"
+
+
+  // Project timestamp pattern
+  val projectTimeStamp = "yyyy-MM-dd HH:mm:ss.SSS"
+
+
   // Hive Database
   val base: String = "database"
   val database: String = "flow"
@@ -25,14 +34,8 @@ class LocalSettings {
   val databaseDirectory: String = "file:///Q:" + s"/$base/$database"
   val tableDirectory: String = databaseDirectory + s"/$table/"
 
-  val warehouseDirectory: String = "Q:" + localSeparator + base +
+  val tablePath: String = "Q:" + localSeparator + base +
     localSeparator + database + localSeparator + table + localSeparator
-
-
-  // Local data directories
-  val resourcesDirectory: String = s"$localDirectory${localSeparator}src" +
-    s"${localSeparator}main${localSeparator}resources$localSeparator"
-  val dataDirectory: String = s"$localDirectory${localSeparator}data$localSeparator"
 
 
 }

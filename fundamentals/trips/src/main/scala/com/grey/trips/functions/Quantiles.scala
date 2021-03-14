@@ -2,6 +2,7 @@ package com.grey.trips.functions
 
 import com.grey.trips.sources.CaseClassOf
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.storage.StorageLevel
 
 class Quantiles(spark: SparkSession) extends CandleClass {
 
@@ -31,7 +32,7 @@ class Quantiles(spark: SparkSession) extends CandleClass {
 
     // Dataset[Row] form
     val caseClassOf = CaseClassOf.caseClassOf(schema = calculations.schema)
-    var calculationsDataset: Dataset[Row] = calculations.as(caseClassOf)
+    var calculationsDataset: Dataset[Row] = calculations.as(caseClassOf).persist(StorageLevel.MEMORY_ONLY)
 
     // The names of the quantiles    
     val quantilesNames = Array("lowerWhisker", "lowerQuartile", "median", "upperQuartile", "upperWhisker")
