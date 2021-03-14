@@ -13,6 +13,11 @@ import scala.sys.process._
 import scala.util.Try
 import scala.util.control.Exception
 
+
+/**
+  *
+  * @param spark: A SparkSession instance
+  */
 class Unload(spark: SparkSession) {
 
   private val interfaceVariables = new InterfaceVariables(spark = spark)
@@ -20,13 +25,23 @@ class Unload(spark: SparkSession) {
   private val dataDirectories = new DataDirectories()
 
 
+  /**
+    *
+    * @param dateTime: The date/time in focus
+    * @param directoryName: The directory into which the data of the date in question should be deposited
+    * @param fileString: The name to assign to the file of unloaded data (the string includes the path string)
+    * @return
+    */
   def unload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
+
 
     // The application programming interface's URL for a data set of interest
     val url: String = interfaceVariables.api.format(dateTime.toString(interfaceVariables.dateTimePattern))
 
+
     // Is the URL alive?
     val isURL: Try[Boolean]  = isExistURL.isExistURL(url)
+
 
     // If yes, unload the data set, otherwise ...
     val data: Try[String] = if (isURL.isSuccess) {
@@ -38,6 +53,7 @@ class Unload(spark: SparkSession) {
       sys.error(isURL.failed.get.getMessage)
     }
 
+
     // Finally
     if (data.isSuccess) {
       println("Successfully unloaded " + url)
@@ -46,6 +62,8 @@ class Unload(spark: SparkSession) {
       sys.error(data.failed.get.getMessage)
     }
 
+
   }
+
 
 }
