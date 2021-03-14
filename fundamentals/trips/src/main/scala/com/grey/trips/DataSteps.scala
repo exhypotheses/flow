@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import com.grey.trips.environment.LocalSettings
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
-import com.grey.trips.sources.{Read, Unload}
+import com.grey.trips.source.{Read, Unload}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
