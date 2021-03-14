@@ -11,7 +11,7 @@ import scala.util.Try
 import scala.util.control.Exception
 
 
-class Restructure(spark: SparkSession) {
+class DataRestructure(spark: SparkSession) {
 
   private val configParameters = new ConfigurationParameters()
   private val localSettings = new LocalSettings()
@@ -21,7 +21,7 @@ class Restructure(spark: SparkSession) {
   private val hiveLayerSettings = new HiveLayerSettings(spark, hiveBaseProperties)
 
 
-  def restructure(minimal: DataFrame, name: String): Try[Unit] = {
+  def dataRestructure(minimal: DataFrame, name: String): Try[Unit] = {
 
     // This import is required for (a) the $-notation, (b) implicit conversions such as converting a RDD
     // to a DataFrame, (c) encoders for [most] types, which are also automatically provided by
