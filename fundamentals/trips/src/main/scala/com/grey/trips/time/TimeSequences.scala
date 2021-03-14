@@ -5,9 +5,9 @@ import org.joda.time.DateTime
 import scala.util.Try
 import scala.util.control.Exception
 
-class TimeConstraints {
+class TimeSequences {
 
-  def sequentialTimes(from: DateTime, until: DateTime): Boolean = {
+  def timeSequences(from: DateTime, until: DateTime): Boolean = {
 
     // Set-up from & until comparison
     val sequential: Try[Boolean] = Exception.allCatch.withTry(
