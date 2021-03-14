@@ -5,7 +5,7 @@ import java.sql.Date
 
 import com.grey.libraries.{ClearUp, HiveBaseCaseClass, HiveLayer, HiveLayerCaseClass}
 import com.grey.trips.environment.DataDirectories
-import com.grey.trips.source.Transfer
+import com.grey.trips.source.DataTransfer
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.parallel.mutable.ParArray
@@ -19,7 +19,7 @@ import scala.util.control.Exception
   */
 class HiveLayerSettings(spark: SparkSession, hiveBaseProperties: HiveBaseCaseClass#HBCC) {
 
-  private val transfer = new Transfer()
+  private val dataTransfer = new DataTransfer()
   private val dataDirectories = new DataDirectories()
   private val clearUp = new ClearUp(spark, hiveBaseProperties)
   private val hiveLayer = new HiveLayer(spark, hiveBaseProperties)
@@ -46,7 +46,7 @@ class HiveLayerSettings(spark: SparkSession, hiveBaseProperties: HiveBaseCaseCla
     // Move the prospective/new table partition files to the Hive hub.  Contents of the
     // 'dst' directory are cleared beforehand
     val move: ParArray[Try[Path]] = if (clear.isSuccess) {
-      transfer.transfer(source = src, destination = dst)
+      dataTransfer.dataTransfer(source = src, destination = dst)
     } else {
       sys.error(clear.failed.get.getMessage)
     }
