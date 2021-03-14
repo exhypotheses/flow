@@ -1,6 +1,7 @@
 package com.grey.trips
 
 import com.grey.trips.environment.{ConfigurationParameters, DataDirectories, LocalSettings}
+import com.grey.trips.functions.Quantiles
 import com.grey.trips.sources.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
@@ -61,12 +62,21 @@ object TripsApp {
 
 
     // Hence
-    if (directories.head.isSuccess) {
+    val process: Try[Unit] = if (directories.head.isSuccess) {
       val dataSteps = new DataSteps(spark)
       dataSteps.dataSteps(listOfDates)
     } else {
       // Superfluous
       sys.error(directories.head.failed.get.getMessage)
+    }
+
+
+    // Spreads; determine each day's riding time distributions.
+    if (process.isSuccess) {
+      new Quantiles(spark = spark).quantiles(partitioningField = "start_date_epoch",
+        calculationField = "duration", fileName = "durationCandles")
+    } else {
+      sys.error(process.failed.get.getMessage)
     }
 
 
