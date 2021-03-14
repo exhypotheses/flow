@@ -36,13 +36,21 @@ class InterfaceTimeSeries(spark: SparkSession) {
   def interfaceTimeSeries(interfaceVariables: InterfaceVariables): List[DateTime] = {
 
 
-    // Boundaries
-    val startDate: String = if (isDatabase.isSuccess && isTable.isSuccess) {
+    // Lower Boundary
+    val date: String = if (isDatabase.isSuccess && isTable.isSuccess) {
       isTable.get.head().getAs[String]("maximum")
     } else {
-      interfaceVariables.variable("times", "startDate")
+      ""
     }
 
+    val startDate: String = if (date.isEmpty) {
+      interfaceVariables.variable("times", "startDate")
+    } else {
+      date
+    }
+
+
+    // Upper Boundary
     val endDate: String = if (interfaceVariables.variable("times", "endDate").isEmpty) {
       DateTimeFormat.forPattern(interfaceVariables.dateTimePattern).print(dateTimeNow)
     } else {
@@ -50,7 +58,7 @@ class InterfaceTimeSeries(spark: SparkSession) {
     }
 
 
-    // The start/from & end/until dates of the data of interest
+    // The DateTime forms of the start/from & end/until dates
     val timeFormats = new TimeFormats(interfaceVariables.dateTimePattern)
     val from: DateTime = timeFormats.timeFormats(startDate)
     val until: DateTime = timeFormats.timeFormats(endDate)
@@ -60,7 +68,7 @@ class InterfaceTimeSeries(spark: SparkSession) {
     new TimeSequences().timeSequences(from = from, until = until)
 
 
-    // List of dates
+    // Hence, the list of dates
     val timeSeries = new TimeSeries()
     val listOfDates: Try[List[DateTime]] = Exception.allCatch.withTry(
       timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType)
