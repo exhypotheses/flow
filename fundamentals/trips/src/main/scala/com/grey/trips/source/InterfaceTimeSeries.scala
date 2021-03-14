@@ -1,4 +1,4 @@
-package com.grey.trips.sources
+package com.grey.trips.source
 
 import com.grey.trips.time.{TimeFormats, TimeSequences, TimeSeries}
 import org.apache.spark.sql.{DataFrame, SparkSession}
