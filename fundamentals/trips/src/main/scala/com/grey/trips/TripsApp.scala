@@ -1,7 +1,7 @@
 package com.grey.trips
 
 import com.grey.trips.environment.{ConfigurationParameters, DataDirectories, LocalSettings}
-import com.grey.trips.sources.{Times, InterfaceVariables}
+import com.grey.trips.sources.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
@@ -13,7 +13,7 @@ object TripsApp {
 
   private val localSettings = new LocalSettings()
   private val configurationParameters = new ConfigurationParameters()
-  private val times = new Times()
+
 
   def main(args: Array[String]): Unit = {
 
@@ -55,7 +55,8 @@ object TripsApp {
     // Foremost, are the date strings and/or periods real Gregorian Calendar dates?
     // Presently, the dates are printed in InterfaceVariables.  The dates will be arguments of this app.
     val interfaceVariables: InterfaceVariables = new InterfaceVariables(spark)
-    val listOfDates: List[DateTime] = times.times(interfaceVariables = interfaceVariables)
+    val interfaceTimeSeries = new InterfaceTimeSeries(spark)
+    val listOfDates: List[DateTime] = interfaceTimeSeries.interfaceTimeSeries(interfaceVariables = interfaceVariables)
     listOfDates.foreach(println(_))
 
 
