@@ -1,4 +1,4 @@
-package com.grey.trips.sources
+package com.grey.trips.source
 
 import com.grey.trips.environment.LocalSettings
 import org.apache.spark.sql.functions.{to_timestamp, trim, unix_timestamp}
