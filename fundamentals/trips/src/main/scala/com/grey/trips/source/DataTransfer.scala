@@ -9,11 +9,11 @@ import scala.collection.parallel.mutable.ParArray
 import scala.util.Try
 import scala.util.control.Exception
 
-class Transfer {
+class DataTransfer {
 
   private val dataDirectories = new DataDirectories()
 
-  def transfer(source: String, destination: String): ParArray[Try[Path]] = {
+  def dataTransfer(source: String, destination: String): ParArray[Try[Path]] = {
 
     // Ensure the destination directory is empty
     val directory: Try[Unit] = Exception.allCatch.withTry(
