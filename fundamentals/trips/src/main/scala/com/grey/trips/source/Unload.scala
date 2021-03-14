@@ -1,4 +1,4 @@
-package com.grey.trips.sources
+package com.grey.trips.source
 
 import java.io.File
 import java.net.URL
