@@ -16,7 +16,6 @@ class Restructure(spark: SparkSession) {
   private val configParameters = new ConfigurationParameters()
   private val localSettings = new LocalSettings()
 
-  private val interfaceVariables = new InterfaceVariables(spark)
   private val fieldsOfInterest: Array[String] = new HiveBaseSettings(spark).fieldsOfInterest
   private val hiveBaseProperties = new HiveBaseProperties().hiveBaseProperties
   private val hiveLayerSettings = new HiveLayerSettings(spark, hiveBaseProperties)
@@ -42,7 +41,7 @@ class Restructure(spark: SparkSession) {
       // data files - there are a few supplementary files - are transferred to a directory
       // within a hive data hub, i.e., 'dst'
       val src: String = localSettings.localWarehouse + date.toString + localSettings.localSeparator
-      val dst: String = localSettings.warehouseDirectory + date.toString + localSettings.localSeparator
+      val dst: String = localSettings.tablePath + date.toString + localSettings.localSeparator
       val partition: String = localSettings.tableDirectory + date.toString + "/"
 
       // For the date in question
@@ -56,7 +55,7 @@ class Restructure(spark: SparkSession) {
         daily.selectExpr(fieldsOfInterest: _*).write
           .option("header", "false")
           .option("encoding", "UTF-8")
-          .option("timestampFormat", interfaceVariables.projectTimeStamp)
+          .option("timestampFormat", localSettings.projectTimeStamp)
           .csv(src)
       )
 
