@@ -1,4 +1,4 @@
-package com.grey.trips.sources
+package com.grey.trips.source
 
 import java.sql.Date
 

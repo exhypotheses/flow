@@ -1,4 +1,4 @@
-package com.grey.trips.sources
+package com.grey.trips.source
 
 import com.grey.trips.types.ScalaDataType
 import org.apache.spark.sql.types.StructType

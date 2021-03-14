@@ -2,7 +2,7 @@ package com.grey.trips
 
 import com.grey.trips.environment.{ConfigurationParameters, DataDirectories, LocalSettings}
 import com.grey.trips.functions.Quantiles
-import com.grey.trips.sources.{InterfaceTimeSeries, InterfaceVariables}
+import com.grey.trips.source.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime

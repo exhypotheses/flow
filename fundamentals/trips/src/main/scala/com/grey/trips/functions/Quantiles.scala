@@ -1,6 +1,6 @@
 package com.grey.trips.functions
 
-import com.grey.trips.sources.CaseClassOf
+import com.grey.trips.source.CaseClassOf
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
 
