@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import com.grey.trips.environment.LocalSettings
 import com.grey.trips.hive.{HiveBaseProperties, HiveBaseSettings}
-import com.grey.trips.source.{Read, Unload}
+import com.grey.trips.source.{DataRead, DataUnload}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DataType, StructType}
@@ -25,8 +25,8 @@ class DataSteps(spark: SparkSession) {
   private val hiveBaseProperties = new HiveBaseProperties().hiveBaseProperties
   private val hiveBaseSettings = new HiveBaseSettings(spark)
 
-  private val unload = new Unload(spark = spark)
-  private val read = new Read(spark)
+  private val dataUnload = new DataUnload(spark = spark)
+  private val dataRead = new DataRead(spark)
 
 
   /**
@@ -63,11 +63,11 @@ class DataSteps(spark: SparkSession) {
       val fileString = directoryName + localSettings.localSeparator + dateTime.toString("MM") + ".json"
 
       // Unload the data
-      val data = unload.unload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
+      val data = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
 
       // Hence
       if (data.isSuccess) {
-        read.read(dateTime = dateTime, fileString = fileString, schema = schema)
+        dataRead.dataRead(dateTime = dateTime, fileString = fileString, schema = schema)
       } else {
         sys.error(data.failed.get.getMessage)
       }
