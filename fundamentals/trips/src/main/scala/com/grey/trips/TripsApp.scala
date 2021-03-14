@@ -73,8 +73,12 @@ object TripsApp {
 
     // Spreads; determine each day's riding time distributions.
     if (process.isSuccess) {
+
+      spark.sql(s"use ${localSettings.database}")
+
       new Quantiles(spark = spark).quantiles(partitioningField = "start_date_epoch",
         calculationField = "duration", fileName = "durationCandles")
+
     } else {
       sys.error(process.failed.get.getMessage)
     }
