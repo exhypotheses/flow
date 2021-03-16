@@ -13,10 +13,10 @@ import scala.util.Try
   *
   * @param spark: A SparkSession instance
   */
-class Read(spark: SparkSession) {
+class DataRead(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
-  private val restructure = new Restructure(spark)
+  private val dataRestructure = new DataRestructure(spark)
 
   private val projectTimeStamp: Column => Column = (x: Column) =>
     to_timestamp(trim(x).substr(0, localSettings.projectTimeStamp.length))
@@ -29,7 +29,7 @@ class Read(spark: SparkSession) {
     * @param schema: The schema of the data file to be read
     * @return
     */
-  def read(dateTime: DateTime, fileString: String, schema: StructType): Try[Unit] = {
+  def dataRead(dateTime: DateTime, fileString: String, schema: StructType): Try[Unit] = {
 
 
     /**
@@ -64,7 +64,7 @@ class Read(spark: SparkSession) {
 
 
     // Hence
-    restructure.restructure(minimal, dateTime.toString("yyyyMM"))
+    dataRestructure.dataRestructure(minimal, dateTime.toString("yyyyMM"))
 
 
   }

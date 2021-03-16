@@ -18,7 +18,7 @@ import scala.util.control.Exception
   *
   * @param spark: A SparkSession instance
   */
-class Unload(spark: SparkSession) {
+class DataUnload(spark: SparkSession) {
 
   private val interfaceVariables = new InterfaceVariables(spark = spark)
   private val isExistURL = new IsExistURL()
@@ -32,7 +32,7 @@ class Unload(spark: SparkSession) {
     * @param fileString: The name to assign to the file of unloaded data (the string includes the path string)
     * @return
     */
-  def unload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
+  def dataUnload(dateTime: DateTime, directoryName: String, fileString: String): Try[String] = {
 
 
     // The application programming interface's URL for a data set of interest
