@@ -28,10 +28,11 @@ class DataSteps(spark: SparkSession) {
     val urlString: String = s"https://gbfs.urbansharing.com/edinburghcyclehire.com/$fileString"
     val unloadString: String = localSettings.dataDirectory + fileString
 
-    val tableVariables = new TableVariables().tableVariables()
-    println( tableVariables("uploadString").format("LOCAL", unloadString, "REPLACE") )
-    println( tableVariables("stringCreateTable") )
 
+    // Databases & Tables
+    val tableVariables = new TableVariables().tableVariables(isLocal = true, infile = unloadString, duplicates = "replace")
+    println(tableVariables("uploadString"))
+    println(tableVariables("stringCreateTable"))
 
 
     // Unload
@@ -39,11 +40,13 @@ class DataSteps(spark: SparkSession) {
 
 
     // Transform
-    if (dataUnload.isSuccess) {
+    val dataFileString: Try[String] = if (dataUnload.isSuccess) {
       new DataTransform(spark = spark).dataTransform(unloadString = unloadString)
     } else {
       sys.error(dataUnload.failed.get.getMessage)
     }
+
+    println(dataFileString.get)
 
 
   }
