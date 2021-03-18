@@ -27,7 +27,7 @@ class DataTransform(spark: SparkSession) {
     * @param unloadString: The string of the file to be read; it includes the path to the file and the file extension
     * @return
     */
-  def dataTransform(unloadString: String): Try[Unit] = {
+  def dataTransform(unloadString: String): Try[String] = {
 
     /**
       * Import implicits for
@@ -45,6 +45,10 @@ class DataTransform(spark: SparkSession) {
     if (data.isFailure) {
       sys.error(data.failed.get.getMessage)
     }
+
+
+    // Target directory after transformation steps
+    val directory = localSettings.warehouseDirectory + "stations"
     
 
     // Data structuring: decompose horizontally
@@ -64,24 +68,53 @@ class DataTransform(spark: SparkSession) {
 
     // Save
     stations.coalesce(1).write.option("header", "true").option("encoding", "UTF-8")
-      .csv(localSettings.warehouseDirectory + "stations")
+      .csv(directory)
 
 
-    // The extraneous spark files
-    val directoryObject = new File(localSettings.warehouseDirectory + "stations")
+    /**
+      * The data has been transformed, and subsequently saved in a
+      * single file.  What is the file's name?
+      */
 
-    val listOfArrays: List[Array[File]] = List("*SUCCESS", "*.crc").map{ string =>
-      val fileFilter: FileFilter = new WildcardFileFilter(string)
-      directoryObject.listFiles(fileFilter)
+    // Directory object
+    val directoryObject = new File(directory)
+
+    // Filter
+    val fileFilter: FileFilter = new WildcardFileFilter("*.csv")
+
+    // The file string
+    val getFileString = Exception.allCatch.withTry(
+      directoryObject.listFiles(fileFilter).head.toString
+    )
+
+    if (getFileString.isSuccess) {
+      getFileString
+    } else {
+      sys.error(getFileString.failed.get.getMessage)
     }
 
 
-    // Eliminate the extraneous files
-    Exception.allCatch.withTry(
-      listOfArrays.reduce( _ union _).par.foreach(x => x.delete())
-    )
-
-    
   }
 
 }
+
+/**
+  * // Determine  extraneous files
+  * val listOfArrays: List\[Array\[File\]\] = List("*SUCCESS", "*.crc").map{ string =>
+  *   val fileFilter: FileFilter = new WildcardFileFilter(string)
+  *         directoryObject.listFiles(fileFilter)
+  * }
+  *
+  * // Eliminate the extraneous files
+  * val eliminate: Try[Unit] = Exception.allCatch.withTry(
+  *       listOfArrays.reduce( _ union _).par.foreach(x => x.delete())
+  * )
+  *
+  * // Hence, the directory in question consists of valid data files only
+  * if (eliminate.isSuccess) {
+  * val fileFilter: FileFilter = new WildcardFileFilter("*.csv")
+  *       directoryObject.listFiles(fileFilter)
+  * } else {
+  *       sys.error(eliminate.failed.get.getMessage)
+  * }
+  */
