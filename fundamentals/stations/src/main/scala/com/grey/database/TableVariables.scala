@@ -3,7 +3,15 @@ package com.grey.database
 class TableVariables {
 
 
-  def tableVariables(): Map[String, String] = {
+  /**
+    * Ref. https://dev.mysql.com/doc/refman/8.0/en/load-data.html
+    *
+    * @param isLocal: true | false -> is the file locally located (true) or hosted within a server (false)
+    * @param infile: The path to the file location; it includes the file name & extension
+    * @param duplicates: Duplicates: REPLACE | IGNORE
+    * @return
+    */
+  def tableVariables(isLocal: Boolean, infile: String, duplicates: String): Map[String, String] = {
 
 
     // Table name
@@ -24,12 +32,12 @@ class TableVariables {
        """.stripMargin
 
 
-    // Load
-    // https://dev.mysql.com/doc/refman/8.0/en/load-data.html
-    // LOCAL, FILESTRING, REPLACE | IGNORE
+    // Statement
+    val location: String = if (isLocal) "LOCAL" else ""
+
     val uploadString =
     raw"""
-       | LOAD DATA %s INFILE '%s' %s INTO TABLE $tableName FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\r\n';
+       | LOAD DATA $location INFILE '$infile' ${duplicates.toUpperCase} INTO TABLE $tableName FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\r\n';
        """.stripMargin
 
 
