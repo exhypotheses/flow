@@ -41,11 +41,6 @@
       <name>Artima Maven Repository</name>
       <url>http://repo.artima.com/releases</url>
     </repository>
-    <repository>
-      <id>project.local</id>
-      <name>project</name>
-      <url>file:///${project.basedir}/.m2/repository</url>
-    </repository>
   </repositories>
 
 
@@ -114,6 +109,11 @@
     <dependency>
       <groupId>com.grey.libraries</groupId>
       <artifactId>spark</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.grey.libraries</groupId>
+      <artifactId>connecting</artifactId>
       <version>1.0</version>
     </dependency>
 
