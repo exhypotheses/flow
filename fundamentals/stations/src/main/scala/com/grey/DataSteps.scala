@@ -2,6 +2,7 @@ package com.grey
 
 import com.grey.database.TableVariables
 import com.grey.environment.LocalSettings
+import com.grey.libraries.mysql.CreateTable
 import com.grey.source.{DataTransform, DataUnload}
 import org.apache.spark.sql.SparkSession
 
@@ -31,8 +32,8 @@ class DataSteps(spark: SparkSession) {
 
     // Databases & Tables
     val tableVariables = new TableVariables().tableVariables(isLocal = true, infile = unloadString, duplicates = "replace")
-    println(tableVariables("uploadString"))
-    println(tableVariables("stringCreateTable"))
+    val createTable = new CreateTable()
+    createTable.createTable(databaseName = "mysql.flow", tableVariables = tableVariables)
 
 
     // Unload
@@ -45,7 +46,6 @@ class DataSteps(spark: SparkSession) {
     } else {
       sys.error(dataUnload.failed.get.getMessage)
     }
-
     println(dataFileString.get)
 
 
