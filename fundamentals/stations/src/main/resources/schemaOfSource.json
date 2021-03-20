@@ -1,0 +1,83 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "ttl",
+      "type": "long",
+      "nullable": false,
+      "metadata": {
+        "comment": "Unknown"
+      }
+    },
+    {
+      "name": "last_updated",
+      "type": "string",
+      "nullable": false,
+      "metadata": {
+        "comment": "Last updated."
+      }
+    },
+    {
+      "name": "data",
+      "type": "struct",
+      "fields": [{
+        "name": "stations",
+        "type": "array",
+        "items":
+          {
+            "type": "struct",
+            "fields": [
+              {
+                "name": "address",
+                "type": "string",
+                "nullable": true,
+                "metadata": {
+                  "comment": "Valid street number and name where station is located. This field is intended to be an actual address, not a free form text description."
+                }
+              },
+              {
+                "name": "capacity",
+                "type": "long",
+                "nullable": true,
+                "metadata": {
+                  "comment": "Number of total docking points installed at this station, both available and unavailable."
+                }
+              },
+              {
+                "name": "lon",
+                "type": "double",
+                "nullable": false,
+                "metadata": {
+                  "comment": "The longitude of station. The field value must be a valid WGS 84 longitude in decimal degrees format."
+                }
+              },
+              {
+                "name": "lat",
+                "type": "double",
+                "nullable": false,
+                "metadata": {
+                  "comment": "The latitude of station. The field value must be a valid WGS 84 latitude in decimal degrees format."
+                }
+              },
+              {
+                "name": "name",
+                "type": "string",
+                "nullable": false,
+                "metadata": {
+                  "comment": "Public name of the station."
+                }
+              },
+              {
+                "name": "station_id",
+                "type": "string",
+                "metadata": {
+                  "comment": "Unique identifier of a station."
+                }
+              }
+            ]
+          }
+      }]
+    }
+
+  ]
+}
