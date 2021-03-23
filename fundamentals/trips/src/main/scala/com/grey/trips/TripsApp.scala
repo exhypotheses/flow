@@ -37,7 +37,6 @@ object TripsApp {
 
 
     // Configurations
-    // spark.conf.set("spark.speculation", value = false)
     spark.conf.set("spark.sql.shuffle.partitions", configurationParameters.nShufflePartitions.toString)
     spark.conf.set("spark.default.parallelism", configurationParameters.nParallelism.toString)
     spark.conf.set("spark.kryoserializer.buffer.max", "2048m")
