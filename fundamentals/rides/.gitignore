@@ -7,6 +7,11 @@ syntax: glob
 #*.off
 *.old
 
+# configurations
+*.conf
+!cycles.conf
+
+
 # eclipse conf file
 .settings
 .classpath
