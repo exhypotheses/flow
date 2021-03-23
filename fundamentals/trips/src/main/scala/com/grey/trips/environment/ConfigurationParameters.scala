@@ -2,17 +2,34 @@ package com.grey.trips.environment
 
 class ConfigurationParameters {
 
-  // Spark Configurations Parameters
-  // If
-  //    m4.2xLarge Master Node, multiples of 16 because there are 16 cores available
-  //    a local 8 core machine, multiples of 8
-  // sql.shuffle.partitions: The number of shuffle partitions for joins & aggregation
-  // default.parallelism: The default number of partitions delivered after a transformation
+
+  /**
+    * If set to "true", performs speculative execution of tasks. This means if one or
+    * more tasks are running slowly in a stage, they will be re-launched
+    *
+    * http://spark.apache.org/docs/2.4.7/configuration.html
+    *
+    * spark.conf.set("spark.speculation", value = false)
+    *
+    */
+
+
+  /**
+    * Spark Configurations Parameters
+    * If
+    *    - m4.2xLarge Master Node: multiples of 16 because there are 16 cores available
+    *    - a local 8 core machine: multiples of 8
+    * sql.shuffle.partitions: The number of shuffle partitions for joins & aggregation
+    * default.parallelism: The default number of partitions delivered after a transformation
+    */
   val nShufflePartitions = 2
   val nParallelism = 2
 
-  // Hive Configuration Parameters
-  // Table: Partitioning
+
+  /**
+    * Hive Configuration Parameters
+    * Table: Partitioning
+    */
   val partitionVariables: Map[String, String] = Map("starting" -> "DATE")
 
 }

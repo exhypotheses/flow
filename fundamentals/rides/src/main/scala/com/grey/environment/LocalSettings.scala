@@ -17,5 +17,8 @@ class LocalSettings {
   val resourcesDirectory: String = Paths.get(localDirectory, "src", "main", "resources").toString + localSeparator
   val dataDirectory: String = Paths.get(localDirectory, "data").toString + localSeparator
 
+  // Project timestamp pattern
+  val projectTimeStamp = "yyyy-MM-dd HH:mm:ss.SSS"
+
 
 }
