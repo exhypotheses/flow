@@ -1,0 +1,122 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "started_at",
+      "type": "string",
+      "nullable": false,
+      "metadata":
+      {
+        "comment": "Ride starting time"
+      }
+    },
+    {
+      "name": "ended_at",
+      "type": "string",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "Ride end time.  If the bicycle is not returned the end time will be null."
+      }
+    },
+    {
+      "name": "duration",
+      "type": "long",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "Ride duration in seconds"
+      }
+    },
+    {
+      "name": "start_station_id",
+      "type": "string",
+      "nullable": false,
+      "metadata":
+      {
+        "comment": "The identification code of the starting station"
+      }
+    },
+    {
+      "name": "start_station_name",
+      "type": "string",
+      "nullable": false,
+      "metadata":
+      {
+        "comment": "The name of the starting station"
+      }
+    },
+    {
+      "name": "start_station_description",
+      "type": "string",
+      "nullable": false,
+      "metadata":
+      {
+        "comment": "The name of the starting station"
+      }
+    },
+    {
+      "name": "start_station_latitude",
+      "type": "double",
+      "nullable": false,
+      "metadata":
+      {
+        "comment": "The starting station latitude"
+      }
+    },
+    {
+      "name": "start_station_longitude",
+      "type": "double",
+      "nullable": false,
+      "metadata":
+      {
+        "comment": "The starting station longitude"
+      }
+    },
+    {
+      "name": "end_station_id",
+      "type": "string",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "The identification code of the end station"
+      }
+    },
+    {
+      "name": "end_station_name",
+      "type": "string",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "The name of the end station"
+      }
+    },
+    {
+      "name": "end_station_description",
+      "type": "string",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "The name of the end station"
+      }
+    },
+    {
+      "name": "end_station_latitude",
+      "type": "double",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "The end station latitude"
+      }
+    },
+    {
+      "name": "end_station_longitude",
+      "type": "double",
+      "nullable": true,
+      "metadata":
+      {
+        "comment": "The end station longitude"
+      }
+    }
+  ]
+}
