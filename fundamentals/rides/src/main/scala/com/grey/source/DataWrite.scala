@@ -37,7 +37,8 @@ class DataWrite(spark: SparkSession) {
 
 
     // Beware of time stamps, e.g., "yyyy-MM-dd HH:mm:ss.SSSXXXZ"
-    val fieldsOfInterest = List()
+    val fieldsOfInterest = List("started_at", "start_station_id", "ended_at", "end_station_id",
+      "duration", "start_date", "start_date_epoch")
     val stream: Try[Unit] = Exception.allCatch.withTry(
       minimal.selectExpr(fieldsOfInterest: _*).write
         .option("header", "true")
@@ -45,6 +46,9 @@ class DataWrite(spark: SparkSession) {
         .option("timestampFormat", localSettings.projectTimeStamp)
         .csv(Paths.get(localSettings.warehouseDirectory + name, "").toString)
     )
+
+
+    // Delete superfluous files
 
 
     // Hence
