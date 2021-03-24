@@ -2,6 +2,7 @@ package com.grey
 
 import java.nio.file.Paths
 
+import com.grey.database.TableVariables
 import com.grey.environment.LocalSettings
 import com.grey.source.{DataRead, DataUnload}
 import org.apache.spark.rdd.RDD
@@ -9,21 +10,38 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
 
-import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 import scala.util.control.Exception
 
+
+/**
+  *
+  * @param spark: A SparkSession instance
+  */
 class DataSteps(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
+  
 
   /**
     *
     * @param listOfDates : List of dates
     */
   def dataSteps(listOfDates: List[DateTime]): Unit = {
+
+
+    // Table
+    val tableVariables = new TableVariables()
+
+    val create: Try[Boolean] = new com.grey.libraries.mysql.CreateTable()
+      .createTable(databaseString = "mysql.flow", tableVariables = tableVariables.tableVariables())
+
+    if (create.isFailure) {
+      sys.error(create.failed.get.getMessage)
+    }
+
 
     // The schema of the data in question
     val schemaProperties: Try[RDD[String]] = Exception.allCatch.withTry(
