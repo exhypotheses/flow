@@ -1,8 +1,10 @@
 package com.grey
 
 import com.grey.environment.{DataDirectories, LocalSettings}
+import com.grey.source.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
+import org.joda.time.DateTime
 
 import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
@@ -29,6 +31,12 @@ object RidesApp {
     val dataDirectories = new DataDirectories()
     val directories: ParSeq[Try[Boolean]] = List(localSettings.dataDirectory, localSettings.warehouseDirectory)
       .par.map( directory => dataDirectories.localDirectoryReset(directory) )
+
+
+    // Dates
+    val interfaceVariables = new InterfaceVariables(spark = spark)
+    val (listOfDates, filterDate): (List[DateTime], String) = new InterfaceTimeSeries(spark = spark)
+      .interfaceTimeSeries(interfaceVariables = interfaceVariables)
 
 
     // Proceed
