@@ -4,9 +4,9 @@ import java.nio.file.Paths
 
 import com.grey.database.TableVariables
 import com.grey.environment.LocalSettings
-import com.grey.source.{DataRead, DataUnload}
+import com.grey.source.{CaseClassOf, DataRead, DataUnload, DataWrite}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
 
@@ -23,13 +23,23 @@ class DataSteps(spark: SparkSession) {
   private val localSettings = new LocalSettings()
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
-  
+  private val caseClassOf = CaseClassOf
+
 
   /**
     *
     * @param listOfDates : List of dates
     */
-  def dataSteps(listOfDates: List[DateTime]): Unit = {
+  def dataSteps(listOfDates: List[DateTime], filterDate: String): Unit = {
+
+
+    /**
+      * Import implicits for
+      * encoding (https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-sql-Encoder.html)
+      * implicit conversions, e.g., converting a RDD to a DataFrames.
+      * access to the "$" notation.
+      */
+    import spark.implicits._
 
 
     // Table
@@ -69,21 +79,29 @@ class DataSteps(spark: SparkSession) {
       val unload: Try[String] = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
 
       // Read
-      val data: Try[DataFrame] = if (unload.isSuccess) {
+      val read: Try[DataFrame] = if (unload.isSuccess) {
         dataRead.dataRead(dateTime = dateTime, fileString = fileString, schema = schema)
       } else {
         sys.error(unload.failed.get.getMessage)
       }
 
-      // Write
-      // dataRestructure.dataRestructure(minimal, dateTime.toString("yyyyMM"), dateFilter)
+      // Filter
+      val minimal: Dataset[Row] = if (read.isSuccess){
+        read.get.as(caseClassOf.caseClassOf(read.get.schema))
+          .filter($"start_date" > filterDate)
+      } else {
+        sys.error(read.failed.get.getMessage)
+      }
 
+      read.get.printSchema()
+      println(read.get.count())
+      println(minimal.count())
+
+      // Write
+      // new DataWrite(spark = spark).dataWrite(minimal= minimal, name = dateTime.toString("yyyyMM"))
 
 
     }
-
-
-
 
 
   }
