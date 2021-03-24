@@ -28,8 +28,9 @@ class TableVariables {
          |    ended_at TIMESTAMP DEFAULT NULL,
          |    end_station_id VARCHAR(15) DEFAULT NULL,
          |    duration BIGINT UNSIGNED DEFAULT NULL,
-         |    start_date DATE NOT NULL
-         |)   PARTITION BY KEY(start_date, start_station_id)
+         |    start_date DATE NOT NULL,
+         |    start_date_epoch BIGINT UNSIGNED NOT NULL
+         |)   PARTITION BY KEY(start_date, start_station_id, end_station_id)
          |    PARTITIONS 8;
        """.stripMargin
 
