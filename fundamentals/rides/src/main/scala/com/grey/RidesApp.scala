@@ -35,7 +35,7 @@ object RidesApp {
 
     // Dates
     val interfaceVariables = new InterfaceVariables(spark = spark)
-    val (listOfDates, filterDate): (List[DateTime], String) = new InterfaceTimeSeries(spark = spark)
+    val (listOfDates, filterDate): (List[DateTime], DateTime) = new InterfaceTimeSeries(spark = spark)
       .interfaceTimeSeries(interfaceVariables = interfaceVariables)
 
 
