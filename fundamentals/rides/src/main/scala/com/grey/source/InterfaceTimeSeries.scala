@@ -1,5 +1,7 @@
 package com.grey.source
 
+import java.sql.Date
+
 import com.grey.time.{TimeFormats, TimeSequences, TimeSeries}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
@@ -32,7 +34,7 @@ class InterfaceTimeSeries(spark: SparkSession) {
     * @param interfaceVariables: A class of the source's key variables
     * @return
     */
-  def interfaceTimeSeries(interfaceVariables: InterfaceVariables): (List[DateTime], DateTime) = {
+  def interfaceTimeSeries(interfaceVariables: InterfaceVariables): (List[DateTime], Date) = {
 
 
     // Lower Boundary
@@ -43,8 +45,8 @@ class InterfaceTimeSeries(spark: SparkSession) {
       ("", "")
     }
 
-    val (startDate, filterDate): (String, String) = if (start.isEmpty) {
-      (interfaceVariables.variable("times", "startDate"), interfaceVariables.variable("times", "filterDate"))
+    val (startDate, filterString): (String, String) = if (start.isEmpty) {
+      (interfaceVariables.variable("times", "startDate"), interfaceVariables.variable("times", "filterString"))
     } else {
       (start, filter)
     }
@@ -73,12 +75,11 @@ class InterfaceTimeSeries(spark: SparkSession) {
     val listOfDates: Try[List[DateTime]] = Exception.allCatch.withTry(
       timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType)
     )
-    listOfDates.get.foreach(println(_))
-    println(filterDate)
 
+
+    // Finally
     if (listOfDates.isSuccess){
-      (listOfDates.get.distinct,
-        new TimeFormats("yyy-MM-dd").timeFormats(filterDate))
+      (listOfDates.get.distinct, java.sql.Date.valueOf(filterString))
     } else {
       sys.error(listOfDates.failed.get.getMessage)
     }
@@ -88,3 +89,16 @@ class InterfaceTimeSeries(spark: SparkSession) {
 
 
 }
+
+/**
+  * import java.sql.Date
+  * import org.joda.time.format.DateTimeFormatter
+  * import org.joda.time.DateTime
+  *
+  * val dateTimeFormatter: DateTimeFormatter = DateTimeFormat.forPattern("yyy-MM-dd")
+  * val filterDateTime: DateTime = new TimeFormats("yyy-MM-dd").timeFormats(filterString)
+  *
+  * val filterDate: Date = java.sql.Date.valueOf(
+  *   filterDateTime.toString(dateTimeFormatter)
+  * )
+  */
