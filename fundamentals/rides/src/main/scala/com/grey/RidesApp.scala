@@ -41,15 +41,14 @@ object RidesApp {
 
     // Proceed
     if (directories.head.isSuccess) {
-
+      new DataSteps(spark = spark)
+        .dataSteps(listOfDates = listOfDates, filterDate = filterDate)
     } else {
       sys.error(directories.head.failed.get.getMessage)
     }
 
 
-
-
-
   }
+
 
 }
