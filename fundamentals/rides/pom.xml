@@ -116,6 +116,11 @@
       <artifactId>spark</artifactId>
       <version>1.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.grey.libraries</groupId>
+      <artifactId>connecting</artifactId>
+      <version>1.0</version>
+    </dependency>
 
   </dependencies>
 
