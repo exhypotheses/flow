@@ -4,11 +4,12 @@ import java.nio.file.Paths
 
 import com.grey.database.TableVariables
 import com.grey.environment.LocalSettings
-import com.grey.source.{CaseClassOf, DataRead, DataUnload, DataWrite}
+import com.grey.source.{CaseClassOf, DataRead, DataUnload}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 import scala.util.Try
 import scala.util.control.Exception
@@ -24,13 +25,14 @@ class DataSteps(spark: SparkSession) {
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
   private val caseClassOf = CaseClassOf
+  val dateTimeFormatter: DateTimeFormatter = DateTimeFormat.forPattern("yyy-MM-dd")
 
 
   /**
     *
     * @param listOfDates : List of dates
     */
-  def dataSteps(listOfDates: List[DateTime], filterDate: String): Unit = {
+  def dataSteps(listOfDates: List[DateTime], filterDate: DateTime): Unit = {
 
 
     /**
@@ -88,11 +90,12 @@ class DataSteps(spark: SparkSession) {
       // Filter
       val minimal: Dataset[Row] = if (read.isSuccess){
         read.get.as(caseClassOf.caseClassOf(read.get.schema))
-          .filter($"start_date" > filterDate)
+          .filter($"start_date" > java.sql.Date.valueOf(filterDate.toString(dateTimeFormatter)))
       } else {
         sys.error(read.failed.get.getMessage)
       }
 
+      // Temporary
       read.get.printSchema()
       println(read.get.count())
       println(minimal.count())
@@ -105,5 +108,6 @@ class DataSteps(spark: SparkSession) {
 
 
   }
+
 
 }
