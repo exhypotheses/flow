@@ -1,4 +1,4 @@
-package com.grey.trips.types
+package com.grey.types
 
 import org.apache.spark.sql.types._
 

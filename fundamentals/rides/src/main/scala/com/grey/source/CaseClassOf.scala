@@ -1,6 +1,6 @@
 package com.grey.source
 
-import com.grey.trips.types.ScalaDataType
+import com.grey.types.ScalaDataType
 import org.apache.spark.sql.types.StructType
 
 object CaseClassOf {
