@@ -32,7 +32,7 @@ class InterfaceTimeSeries(spark: SparkSession) {
     * @param interfaceVariables: A class of the source's key variables
     * @return
     */
-  def interfaceTimeSeries(interfaceVariables: InterfaceVariables): (List[DateTime], String) = {
+  def interfaceTimeSeries(interfaceVariables: InterfaceVariables): (List[DateTime], DateTime) = {
 
 
     // Lower Boundary
@@ -44,7 +44,7 @@ class InterfaceTimeSeries(spark: SparkSession) {
     }
 
     val (startDate, filterDate): (String, String) = if (start.isEmpty) {
-      (interfaceVariables.variable("times", "startDate"), interfaceVariables.variable("times", "startDate"))
+      (interfaceVariables.variable("times", "startDate"), interfaceVariables.variable("times", "filterDate"))
     } else {
       (start, filter)
     }
@@ -73,9 +73,12 @@ class InterfaceTimeSeries(spark: SparkSession) {
     val listOfDates: Try[List[DateTime]] = Exception.allCatch.withTry(
       timeSeries.timeSeries(from, until, interfaceVariables.step, interfaceVariables.stepType)
     )
+    listOfDates.get.foreach(println(_))
+    println(filterDate)
 
     if (listOfDates.isSuccess){
-      (listOfDates.get.distinct, filterDate)
+      (listOfDates.get.distinct,
+        new TimeFormats("yyy-MM-dd").timeFormats(filterDate))
     } else {
       sys.error(listOfDates.failed.get.getMessage)
     }
