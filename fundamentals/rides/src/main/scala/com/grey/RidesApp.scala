@@ -1,5 +1,7 @@
 package com.grey
 
+import java.sql.Date
+
 import com.grey.environment.{DataDirectories, LocalSettings}
 import com.grey.source.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
@@ -35,7 +37,7 @@ object RidesApp {
 
     // Dates
     val interfaceVariables = new InterfaceVariables(spark = spark)
-    val (listOfDates, filterDate): (List[DateTime], DateTime) = new InterfaceTimeSeries(spark = spark)
+    val (listOfDates, filterDate): (List[DateTime], Date) = new InterfaceTimeSeries(spark = spark)
       .interfaceTimeSeries(interfaceVariables = interfaceVariables)
 
 
