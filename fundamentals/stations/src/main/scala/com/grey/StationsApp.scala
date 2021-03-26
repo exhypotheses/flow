@@ -7,11 +7,13 @@ import org.apache.spark.sql.SparkSession
 import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 
+
 object StationsApp {
 
   private val localSettings = new LocalSettings()
 
   def main(args: Array[String]): Unit = {
+
 
     // Minimising log information output
     Logger.getLogger("org").setLevel(Level.OFF)
@@ -40,5 +42,6 @@ object StationsApp {
 
 
   }
+
 
 }
