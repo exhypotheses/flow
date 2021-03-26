@@ -1,8 +1,10 @@
 package com.grey.source
 
+import java.io.{File, FileFilter}
 import java.nio.file.Paths
 
 import com.grey.environment.LocalSettings
+import org.apache.commons.io.filefilter.WildcardFileFilter
 import org.apache.spark.sql._
 
 import scala.util.Try
@@ -24,7 +26,7 @@ class DataWrite(spark: SparkSession) {
     * @param name: The name of the directory leaf into wherein the data is saved
     * @return
     */
-  def dataWrite(minimal: DataFrame, name: String): Try[Unit] = {
+  def dataWrite(minimal: DataFrame, name: String): Array[File] = {
 
     /**
       * This import is required for (a) the $-notation, (b) implicit conversions such as converting a RDD
@@ -34,8 +36,13 @@ class DataWrite(spark: SparkSession) {
       * import spark.implicits._
       *
       */
+        
 
-
+    // Directory object
+    val directory = localSettings.warehouseDirectory + name
+    val directoryObject = new File(directory)
+    
+    
     // Beware of time stamps, e.g., "yyyy-MM-dd HH:mm:ss.SSSXXXZ"
     val fieldsOfInterest = List("started_at", "start_station_id", "ended_at", "end_station_id",
       "duration", "start_date", "start_date_epoch")
@@ -44,21 +51,37 @@ class DataWrite(spark: SparkSession) {
         .option("header", "true")
         .option("encoding", "UTF-8")
         .option("timestampFormat", localSettings.projectTimeStamp)
-        .csv(Paths.get(localSettings.warehouseDirectory + name, "").toString)
+        .csv(Paths.get(directory, "").toString)
     )
 
 
-    // Delete superfluous files
-
-
-    // Hence
-    if (stream.isSuccess) {
-      stream
+    // Determine extraneous files ... extraneous files array (EFA)
+    val listOfEFA = if (stream.isSuccess){
+      List("*SUCCESS", "*.crc").map{ string =>
+        val fileFilter: FileFilter = new WildcardFileFilter(string)
+        directoryObject.listFiles(fileFilter)
+      }
     } else {
       sys.error(stream.failed.get.getMessage)
     }
 
 
+    // Eliminate the extraneous files
+    val eliminate: Try[Unit] = Exception.allCatch.withTry(
+      listOfEFA.reduce( _ union _).par.foreach(x => x.delete())
+    )
+
+
+    // Hence, the directory in question consists of valid data files only
+    if (eliminate.isSuccess) {
+      val fileFilter: FileFilter = new WildcardFileFilter("*.csv")
+      directoryObject.listFiles(fileFilter)
+    } else {
+      sys.error(eliminate.failed.get.getMessage)
+    }
+
+
   }
+
 
 }
