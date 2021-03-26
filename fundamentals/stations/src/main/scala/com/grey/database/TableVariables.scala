@@ -11,7 +11,7 @@ class TableVariables {
     * @param duplicates: Duplicates: REPLACE | IGNORE
     * @return
     */
-  def tableVariables(isLocal: Boolean, infile: String, duplicates: String): Map[String, String] = {
+  def tableVariables(isLocal: Boolean = false, infile: String = "", duplicates: String = "replace"): Map[String, String] = {
 
 
     // Table name
