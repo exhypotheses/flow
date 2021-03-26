@@ -62,7 +62,7 @@ class DataTransform(spark: SparkSession) {
     // ... decompose horizontally, and rename
     val stations = nests.select($"station.*")
       .select($"station_id", $"capacity", $"lat".as("latitude"), $"lon".as("longitude"),
-        $"name", $"address")
+        $"name", $"address").distinct()
     stations.show(5)
 
 
@@ -96,25 +96,28 @@ class DataTransform(spark: SparkSession) {
 
   }
 
+
 }
 
 /**
-  * // Determine  extraneous files
-  * val listOfArrays: List\[Array\[File\]\] = List("*SUCCESS", "*.crc").map{ string =>
-  *   val fileFilter: FileFilter = new WildcardFileFilter(string)
-  *         directoryObject.listFiles(fileFilter)
-  * }
-  *
-  * // Eliminate the extraneous files
-  * val eliminate: Try[Unit] = Exception.allCatch.withTry(
-  *       listOfArrays.reduce( _ union _).par.foreach(x => x.delete())
-  * )
-  *
-  * // Hence, the directory in question consists of valid data files only
-  * if (eliminate.isSuccess) {
-  * val fileFilter: FileFilter = new WildcardFileFilter("*.csv")
-  *       directoryObject.listFiles(fileFilter)
-  * } else {
-  *       sys.error(eliminate.failed.get.getMessage)
-  * }
+
+  // Determine  extraneous files
+  val listOfArrays: List\[Array\[File\]\] = List("*SUCCESS", "*.crc").map{ string =>
+    val fileFilter: FileFilter = new WildcardFileFilter(string)
+      directoryObject.listFiles(fileFilter)
+  }
+
+  // Eliminate the extraneous files
+  val eliminate: Try[Unit] = Exception.allCatch.withTry(
+    listOfArrays.reduce( _ union _).par.foreach(x => x.delete())
+  )
+
+  // Hence, the directory in question consists of valid data files only
+  if (eliminate.isSuccess) {
+    val fileFilter: FileFilter = new WildcardFileFilter("*.csv")
+      directoryObject.listFiles(fileFilter)
+  } else {
+      sys.error(eliminate.failed.get.getMessage)
+  }
+
   */
