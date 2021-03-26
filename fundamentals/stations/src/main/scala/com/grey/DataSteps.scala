@@ -1,7 +1,7 @@
 package com.grey
 
 import com.grey.database.TableVariables
-import com.grey.environment.LocalSettings
+import com.grey.environment.{DataDirectories, LocalSettings}
 import com.grey.libraries.mysql.CreateTable
 import com.grey.source.{DataTransform, DataUnload}
 import org.apache.spark.sql.SparkSession
@@ -9,19 +9,19 @@ import org.apache.spark.sql.SparkSession
 import scala.language.postfixOps
 import scala.util.Try
 
+
+/**
+  *
+  * @param spark: A SparkSession instance
+  */
 class DataSteps(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
 
+  /**
+    * Steps
+    */
   def dataSteps(): Unit = {
-
-
-    /**
-      * Import implicits for
-      * encoding (https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-sql-Encoder.html)
-      * implicit conversions, e.g., converting a RDD to a DataFrames.
-      * access to the "$" notation.
-      */
 
 
     // The stations
@@ -31,24 +31,61 @@ class DataSteps(spark: SparkSession) {
 
 
     // Databases & Tables
-    val tableVariables = new TableVariables().tableVariables(isLocal = true, infile = unloadString, duplicates = "replace")
+    val tableVariablesInstance = new TableVariables()
     val createTable = new CreateTable()
-    createTable.createTable(databaseName = "mysql.flow", tableVariables = tableVariables)
+    val create: Try[Boolean] = createTable.createTable(databaseString = "mysql.flow",
+      tableVariables = tableVariablesInstance.tableVariables())
 
 
     // Unload
-    val dataUnload: Try[String] = new DataUnload().dataUnload(urlString = urlString, unloadString = unloadString)
+    val dataUnload: Try[String] = if (create.isSuccess){
+      new DataUnload().dataUnload(urlString = urlString, unloadString = unloadString)
+    } else {
+      sys.error(create.failed.get.getMessage)
+    }
 
 
-    // Transform
+    //  Transform: The data file string is a directory path + file name + file extension string
+    //  from whence data is uploaded into a database table
     val dataFileString: Try[String] = if (dataUnload.isSuccess) {
       new DataTransform(spark = spark).dataTransform(unloadString = unloadString)
     } else {
       sys.error(dataUnload.failed.get.getMessage)
     }
-    println(dataFileString.get)
+
+
+    /**
+      * // Upload
+      * val upload: Try[Boolean] = if (dataFileString.isSuccess){
+      * new DataUpload().dataUpload(
+      * tableVariables = tableVariablesInstance.tableVariables(infile = dataFileString.get)
+      * )
+      * } else {
+      *         sys.error(dataFileString.failed.get.getMessage)
+      * }
+      */
+
+
+    /**
+      * // Hence
+      *
+      * if (upload.isSuccess){
+      *   println("The table %s has been updated"
+      * .format(tableVariablesInstance.tableVariables()("tableName")))
+      * }
+      */
+
+
+    // Preliminary
+    if (dataFileString.isSuccess){
+      new DataDirectories()
+        .localDirectoryDelete(directoryName = localSettings.warehouseDirectory)
+    } else {
+      sys.error(dataFileString.failed.get.getMessage)
+    }
 
 
   }
+
 
 }
