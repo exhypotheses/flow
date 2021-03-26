@@ -1,16 +1,18 @@
 package com.grey
 
+import java.io.File
 import java.nio.file.Paths
 import java.sql.Date
 
 import com.grey.database.TableVariables
 import com.grey.environment.LocalSettings
-import com.grey.source.{CaseClassOf, DataRead, DataUnload}
+import com.grey.source.{CaseClassOf, DataRead, DataUnload, DataWrite}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
 
+import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 import scala.util.control.Exception
 
@@ -67,7 +69,7 @@ class DataSteps(spark: SparkSession) {
 
 
     // Per time period: The host stores the data as month files
-    listOfDates.par.foreach{ dateTime =>
+    val instances: ParSeq[Array[File]] = listOfDates.par.map{ dateTime =>
 
       // The directory into which the data of the date in question should be deposited (directoryName) and
       // the name to assign to the data file (fileString).  Note that fileString includes the path name.
@@ -98,10 +100,13 @@ class DataSteps(spark: SparkSession) {
       println(minimal.count())
 
       // Write
-      // new DataWrite(spark = spark).dataWrite(minimal= minimal, name = dateTime.toString("yyyyMM"))
-
+      new DataWrite(spark = spark)
+        .dataWrite(minimal= minimal, name = dateTime.toString("yyyyMM"))
 
     }
+
+
+    instances.reduceRight( _ union _ ).foreach(println(_))
 
 
   }
