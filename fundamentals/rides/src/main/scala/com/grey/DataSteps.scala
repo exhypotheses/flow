@@ -92,6 +92,7 @@ class DataSteps(spark: SparkSession) {
 
     }
 
+
     // Transfer
     val fileObjects: Array[File] = arraysOfFileObjects.reduceRight( _ union _ )
     val setup: Try[ParArray[Path]] = Exception.allCatch.withTry(
@@ -102,11 +103,14 @@ class DataSteps(spark: SparkSession) {
       }
     )
 
-    if (setup.isSuccess){
-      println("All set")
-      setup.get.foreach(println(_))
-    }
 
+    // Next: ... Upload
+    if (setup.isSuccess){
+      setup.get.foreach{path =>
+        // Replace this message with the upload function
+        println("uploading %s next".format(path.toString))
+      }
+    }
 
 
   }
