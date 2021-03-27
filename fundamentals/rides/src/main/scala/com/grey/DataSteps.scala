@@ -1,18 +1,20 @@
 package com.grey
 
 import java.io.File
-import java.nio.file.Paths
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.sql.Date
 
 import com.grey.database.TableVariables
 import com.grey.environment.LocalSettings
-import com.grey.source.{CaseClassOf, DataRead, DataUnload, DataWrite}
+import com.grey.pre.{DataStructure, DataWrite}
+import com.grey.source.{DataRead, DataUnload}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
 
 import scala.collection.parallel.immutable.ParSeq
+import scala.collection.parallel.mutable.ParArray
 import scala.util.Try
 import scala.util.control.Exception
 
@@ -26,7 +28,6 @@ class DataSteps(spark: SparkSession) {
   private val localSettings = new LocalSettings()
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
-  private val caseClassOf = CaseClassOf
 
 
   /**
@@ -34,15 +35,6 @@ class DataSteps(spark: SparkSession) {
     * @param listOfDates : List of dates
     */
   def dataSteps(listOfDates: List[DateTime], filterDate: Date): Unit = {
-
-
-    /**
-      * Import implicits for
-      * encoding (https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-sql-Encoder.html)
-      * implicit conversions, e.g., converting a RDD to a DataFrames.
-      * access to the "$" notation.
-      */
-    import spark.implicits._
 
 
     // Table
@@ -69,7 +61,7 @@ class DataSteps(spark: SparkSession) {
 
 
     // Per time period: The host stores the data as month files
-    val instances: ParSeq[Array[File]] = listOfDates.par.map{ dateTime =>
+    val arraysOfFileObjects: ParSeq[Array[File]] = listOfDates.par.map{ dateTime =>
 
       // The directory into which the data of the date in question should be deposited (directoryName) and
       // the name to assign to the data file (fileString).  Note that fileString includes the path name.
@@ -77,7 +69,8 @@ class DataSteps(spark: SparkSession) {
       val fileString = directoryName + localSettings.localSeparator + dateTime.toString("MM") + ".json"
 
       // Unload
-      val unload: Try[String] = dataUnload.dataUnload(dateTime = dateTime, directoryName = directoryName, fileString = fileString)
+      val unload: Try[String] = dataUnload.dataUnload(
+        dateTime = dateTime, directoryName = directoryName, fileString = fileString)
 
       // Read
       val read: Try[DataFrame] = if (unload.isSuccess) {
@@ -86,18 +79,12 @@ class DataSteps(spark: SparkSession) {
         sys.error(unload.failed.get.getMessage)
       }
 
-      // Filter
-      val minimal: Dataset[Row] = if (read.isSuccess){
-        read.get.as(caseClassOf.caseClassOf(read.get.schema))
-          .filter($"start_date" > filterDate)
+      // Structure
+      val minimal: Dataset[Row] = if (read.isSuccess) {
+        new DataStructure(spark = spark).dataStructure(read = read.get, filterDate = filterDate)
       } else {
         sys.error(read.failed.get.getMessage)
       }
-
-      // Temporary
-      read.get.printSchema()
-      println(read.get.count())
-      println(minimal.count())
 
       // Write
       new DataWrite(spark = spark)
@@ -105,8 +92,21 @@ class DataSteps(spark: SparkSession) {
 
     }
 
+    // Transfer
+    val fileObjects: Array[File] = arraysOfFileObjects.reduceRight( _ union _ )
+    val setup: Try[ParArray[Path]] = Exception.allCatch.withTry(
+      fileObjects.par.map{fileObject =>
+        Files.move(Paths.get(fileObject.toString),
+          Paths.get(localSettings.root, fileObject.getParentFile.getName + fileObject.getName),
+          StandardCopyOption.REPLACE_EXISTING)
+      }
+    )
 
-    instances.reduceRight( _ union _ ).foreach(println(_))
+    if (setup.isSuccess){
+      println("All set")
+      setup.get.foreach(println(_))
+    }
+
 
 
   }
