@@ -1,6 +1,6 @@
 package com.grey.environment
 
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 
 class LocalSettings {
 
@@ -16,6 +16,11 @@ class LocalSettings {
   val warehouseDirectory: String = Paths.get(localDirectory, "warehouse").toString + localSeparator
   val resourcesDirectory: String = Paths.get(localDirectory, "src", "main", "resources").toString + localSeparator
   val dataDirectory: String = Paths.get(localDirectory, "data").toString + localSeparator
+
+  val keys: Map[String, String] = new com.grey.libraries.DataDatabase()
+    .dataDatabase(databaseName = "mysql.flow")
+  val root: String = Paths.get(keys("operations")).toAbsolutePath.toString
+
 
   // Project timestamp pattern
   val projectTimeStamp = "yyyy-MM-dd HH:mm:ss.SSS"
