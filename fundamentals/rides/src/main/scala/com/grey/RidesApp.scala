@@ -1,5 +1,6 @@
 package com.grey
 
+import java.io.File
 import java.sql.Date
 
 import com.grey.environment.{DataDirectories, LocalSettings}
@@ -33,6 +34,9 @@ object RidesApp {
     val dataDirectories = new DataDirectories()
     val directories: ParSeq[Try[Boolean]] = List(localSettings.dataDirectory, localSettings.warehouseDirectory)
       .par.map( directory => dataDirectories.localDirectoryReset(directory) )
+
+    val rootObject = new File(localSettings.root)
+    rootObject.listFiles().par.foreach(_.delete())
 
 
     // Dates

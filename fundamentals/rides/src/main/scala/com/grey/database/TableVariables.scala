@@ -30,9 +30,10 @@ class TableVariables {
          |    duration BIGINT UNSIGNED DEFAULT NULL COMMENT 'The duration of the ride in seconds',
          |    start_date DATE NOT NULL COMMENT 'The date the ride started',
          |    start_date_epoch BIGINT UNSIGNED NOT NULL COMMENT 'UNIX Epoch from 1 January 1970 00 00 00 UTC',
-         |    PRIMARY KEY (rides_id, start_date_epoch))
-         |    PARTITION BY HASH(start_date_epoch)
-         |    PARTITIONS 8;
+         |    PRIMARY KEY (rides_id, start_date_epoch),
+         |    FOREIGN KEY (start_station_id) REFERENCES stations (station_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+         |    FOREIGN KEY (end_station_id) REFERENCES stations (station_id) ON UPDATE CASCADE ON DELETE RESTRICT
+         |    );
        """.stripMargin
 
 
@@ -54,3 +55,24 @@ class TableVariables {
 
 
 }
+
+/**
+  Beware, foreign keys are not yet supported in conjunction with partitioning, hence the table
+  is being created without partitioning.
+
+  val stringCreateTable: String =
+    s"""
+      |CREATE TABLE IF NOT EXISTS $tableName (
+      |   rides_id INTEGER NOT NULL AUTO_INCREMENT,
+      |   started_at TIMESTAMP NOT NULL COMMENT 'The start date and time of the ride',
+      |   start_station_id VARCHAR(15) NOT NULL COMMENT 'The unique identifier of the start station',
+      |   ended_at TIMESTAMP DEFAULT NULL COMMENT 'The end date and time of the ride',
+      |   end_station_id VARCHAR(15) DEFAULT NULL COMMENT 'The unique identifier of the end station',
+      |   duration BIGINT UNSIGNED DEFAULT NULL COMMENT 'The duration of the ride in seconds',
+      |   start_date DATE NOT NULL COMMENT 'The date the ride started',
+      |   start_date_epoch BIGINT UNSIGNED NOT NULL COMMENT 'UNIX Epoch from 1 January 1970 00 00 00 UTC',
+      |   PRIMARY KEY (rides_id, start_date_epoch))
+      |   PARTITION BY HASH(start_date_epoch)
+      |   PARTITIONS 8;
+     """.stripMargin
+  */
