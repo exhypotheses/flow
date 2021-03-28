@@ -15,18 +15,14 @@ class LocalSettings {
   val localSeparator: String = System.getProperty("file.separator")
 
 
-  // The local warehouse directory
-  val keys: Map[String, String] = new com.grey.libraries.DataDatabase()
-    .dataDatabase(databaseName = "mysql.flow")
-  val root: Path = Paths.get(keys("operations"))
-
-  val warehouseDirectory: String = Paths
-    .get(root.toAbsolutePath.toString, "warehouse").toString + localSeparator
-
-
-  // Other local directories
+  // Local data directories
+  val warehouseDirectory: String = Paths.get(localDirectory, "warehouse").toString + localSeparator
   val resourcesDirectory: String = Paths.get(localDirectory, "src", "main", "resources").toString + localSeparator
   val dataDirectory: String = Paths.get(localDirectory, "data").toString + localSeparator
+
+  val keys: Map[String, String] = new com.grey.libraries.DataDatabase()
+    .dataDatabase(databaseName = "mysql.flow")
+  val root: String = Paths.get(keys("operations")).toAbsolutePath.toString
 
 
 }
