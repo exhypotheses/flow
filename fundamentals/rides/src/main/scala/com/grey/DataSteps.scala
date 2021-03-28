@@ -1,10 +1,10 @@
 package com.grey
 
 import java.io.File
-import java.nio.file.{Files, Path, Paths, StandardCopyOption}
+import java.nio.file.Paths
 import java.sql.Date
 
-import com.grey.database.TableVariables
+import com.grey.database.{DataSetUp, TableVariables}
 import com.grey.environment.LocalSettings
 import com.grey.pre.{DataStructure, DataWrite}
 import com.grey.source.{DataRead, DataUnload}
@@ -14,7 +14,6 @@ import org.apache.spark.sql.types.{DataType, StructType}
 import org.joda.time.DateTime
 
 import scala.collection.parallel.immutable.ParSeq
-import scala.collection.parallel.mutable.ParArray
 import scala.util.Try
 import scala.util.control.Exception
 
@@ -29,6 +28,7 @@ class DataSteps(spark: SparkSession) {
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
   private val dataWrite = new DataWrite()
+  private val dataSetUp = new DataSetUp()
 
   /**
     *
@@ -89,23 +89,15 @@ class DataSteps(spark: SparkSession) {
     }
 
 
-    // Transfer
+    // Set-up data for upload
     val fileObjects: Array[File] = arraysOfFileObjects.reduceRight( _ union _ )
-    val setup: Try[ParArray[Path]] = Exception.allCatch.withTry(
-      fileObjects.par.map{fileObject =>
-        Files.move(Paths.get(fileObject.toString),
-          Paths.get(localSettings.root, fileObject.getParentFile.getName + fileObject.getName),
-          StandardCopyOption.REPLACE_EXISTING)
-      }
-    )
+    val setUp = dataSetUp.dataSetUp(fileObjects = fileObjects)
 
 
-    // Next: ... Upload
-    if (setup.isSuccess){
-      setup.get.foreach{path =>
-        // Replace this message with the upload function
-        println("uploading %s next".format(path.toString))
-      }
+    // ... Upload
+    // Replace this message with the upload function
+    setUp.get.foreach{path =>
+      println("uploading %s next".format(path.toString))
     }
 
 
