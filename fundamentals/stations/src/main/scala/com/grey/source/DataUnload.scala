@@ -18,7 +18,6 @@ class DataUnload {
     // Valid URL?
     val isExistURL: Try[Boolean] = new IsExistURL().isExistURL(urlString = urlString)
 
-
     // Unload
     val unload: Try[String] = if (isExistURL.isSuccess) {
       Exception.allCatch.withTry(
@@ -28,8 +27,8 @@ class DataUnload {
       sys.error(isExistURL.failed.get.getMessage)
     }
 
+    // Hence
     unload
-
 
   }
 
