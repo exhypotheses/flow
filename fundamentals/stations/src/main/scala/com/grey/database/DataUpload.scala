@@ -1,5 +1,6 @@
 package com.grey.database
 
+import com.grey.environment.{DataDirectories, LocalSettings}
 import com.grey.libraries.mysql.LoadData
 
 import scala.util.Try
@@ -9,6 +10,8 @@ import scala.util.Try
   * Upload
   */
 class DataUpload() {
+
+  private val localSettings = new LocalSettings()
 
   /**
     *
@@ -23,6 +26,10 @@ class DataUpload() {
 
     // Hence
     if (upload.isSuccess) {
+
+      new DataDirectories()
+        .localDirectoryDelete(directoryName = localSettings.warehouseDirectory)
+
       upload
     } else {
       // Superfluous
