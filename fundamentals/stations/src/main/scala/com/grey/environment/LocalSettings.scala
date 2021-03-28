@@ -1,6 +1,6 @@
 package com.grey.environment
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.Paths
 
 class LocalSettings {
 
