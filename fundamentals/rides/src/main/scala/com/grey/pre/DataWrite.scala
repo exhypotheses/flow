@@ -13,41 +13,28 @@ import scala.util.control.Exception
 
 /**
   *
-  * @param spark: An instance of SparkSession
   */
-class DataWrite(spark: SparkSession) {
+class DataWrite() {
 
   private val localSettings = new LocalSettings()
 
-
   /**
     *
-    * @param minimal: The data set that will be saved
+    * @param data: The data set that will be saved
     * @param name: The name of the directory leaf into wherein the data is saved
     * @return
     */
-  def dataWrite(minimal: DataFrame, name: String): Array[File] = {
+  def dataWrite(data: DataFrame, name: String): Array[File] = {
 
-    /**
-      * This import is required for (a) the $-notation, (b) implicit conversions such as converting a RDD
-      * to a DataFrame, (c) encoders for [most] types, which are also automatically provided by
-      * via spark.implicits._
-      *
-      * import spark.implicits._
-      *
-      */
-        
-
+    
     // Directory object
     val directory = localSettings.warehouseDirectory + name
     val directoryObject = new File(directory)
     
     
     // Beware of time stamps, e.g., "yyyy-MM-dd HH:mm:ss.SSSXXXZ"
-    val fieldsOfInterest = List("started_at", "start_station_id", "ended_at", "end_station_id",
-      "duration", "start_date", "start_date_epoch")
     val stream: Try[Unit] = Exception.allCatch.withTry(
-      minimal.selectExpr(fieldsOfInterest: _*).write
+      data.write
         .option("header", "true")
         .option("encoding", "UTF-8")
         .option("timestampFormat", localSettings.projectTimeStamp)
