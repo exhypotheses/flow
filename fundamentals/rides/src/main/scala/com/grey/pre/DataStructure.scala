@@ -4,11 +4,26 @@ import java.sql.Date
 
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
+
+/**
+  *
+  * @param spark: An instance of SparkSession
+  */
 class DataStructure(spark: SparkSession) {
 
   private val caseClassOf = CaseClassOf
+  private val fieldsOfInterest = List("started_at", "start_station_id",
+    "ended_at", "end_station_id", "duration", "start_date", "start_date_epoch")
 
-  def dataStructure(read: DataFrame, filterDate: Date): Dataset[Row] = {
+
+  /**
+    *
+    * @param data: The data in focus
+    * @param filterDate: Ensures that the data consists of new data records, i.e., records beyond
+    *                    the maximum date in the relevant database table.
+    * @return
+    */
+  def dataStructure(data: DataFrame, filterDate: Date): Dataset[Row] = {
 
     /**
       * Import implicits for
@@ -21,10 +36,10 @@ class DataStructure(spark: SparkSession) {
 
     // Filter
     val minimal: Dataset[Row] =
-      read.as(caseClassOf.caseClassOf(read.schema))
+      data.as(caseClassOf.caseClassOf(data.schema))
         .filter($"start_date" > filterDate)
+    minimal.selectExpr(fieldsOfInterest: _*)
 
-    minimal
   }
 
 }
