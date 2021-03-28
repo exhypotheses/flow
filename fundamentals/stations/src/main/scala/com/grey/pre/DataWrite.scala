@@ -17,7 +17,7 @@ class DataWrite {
 
 
     // Directory object
-    val directory = localSettings.warehouseDirectory
+    val directory = localSettings.warehouseDirectory + "data"
     val directoryObject = new File(directory)
 
 
