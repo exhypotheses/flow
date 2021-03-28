@@ -28,7 +28,7 @@ class DataSteps(spark: SparkSession) {
   private val localSettings = new LocalSettings()
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
-
+  private val dataWrite = new DataWrite()
 
   /**
     *
@@ -80,15 +80,11 @@ class DataSteps(spark: SparkSession) {
       }
 
       // Structure
-      val minimal: Dataset[Row] = if (read.isSuccess) {
-        new DataStructure(spark = spark).dataStructure(read = read.get, filterDate = filterDate)
-      } else {
-        sys.error(read.failed.get.getMessage)
-      }
+      val minimal: Dataset[Row] = new DataStructure(spark = spark)
+        .dataStructure(data = read.get, filterDate = filterDate)
 
       // Write
-      new DataWrite(spark = spark)
-        .dataWrite(minimal= minimal, name = dateTime.toString("yyyyMM"))
+      dataWrite.dataWrite(data = minimal, name = dateTime.toString("yyyyMM"))
 
     }
 
