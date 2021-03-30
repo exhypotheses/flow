@@ -2,7 +2,6 @@ package com.grey.database
 
 class TableVariables {
 
-
   /**
     * Ref. https://dev.mysql.com/doc/refman/8.0/en/load-data.html
     *
@@ -33,11 +32,14 @@ class TableVariables {
 
 
     // Statement
-    val location: String = if (isLocal) "LOCAL" else ""
-
     val uploadString =
-    raw"""
-       | LOAD DATA $location INFILE '$infile' ${duplicates.toUpperCase} INTO TABLE $tableName FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
+      s"""
+         |COPY $tableName FROM '$infile' WITH
+         |FORMAT csv
+         |DELIMITER ','
+         |HEADER TRUE
+         |QUOTE '"'
+         |ENCODING UTF8
        """.stripMargin
 
 
@@ -49,3 +51,20 @@ class TableVariables {
 
 
 }
+
+/** Case: MySQL
+
+  val location: String = if (isLocal) "LOCAL" else ""
+
+  val uploadString =
+  raw"""
+     | LOAD DATA $location
+     | INFILE '$infile' ${duplicates.toUpperCase}
+     | INTO TABLE $tableName
+     | FIELDS TERMINATED BY ','
+     | OPTIONALLY ENCLOSED BY '"'
+     | LINES TERMINATED BY '\r\n'
+     | IGNORE 1 LINES;
+      """.stripMargin
+
+  */
