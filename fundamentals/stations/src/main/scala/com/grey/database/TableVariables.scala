@@ -24,8 +24,8 @@ class TableVariables {
          |CREATE TABLE IF NOT EXISTS $tableName (
          |    station_id VARCHAR(15) NOT NULL PRIMARY KEY,
          |    capacity SMALLINT DEFAULT NULL,
-         |    latitude DECIMAL(24, 21) NOT NULL,
-         |    longitude DECIMAL(24, 21) NOT NULL,
+         |    latitude NUMERIC(24, 21) NOT NULL,
+         |    longitude NUMERIC(24, 21) NOT NULL,
          |    name VARCHAR(255) NOT NULL,
          |    address VARCHAR(1023) DEFAULT NULL
          |);
