@@ -15,6 +15,8 @@ class DataSetUp {
 
   def dataSetUp(fileObjects: Array[File]): Try[ParArray[Path]] = {
 
+    println( "data set-up in %s ".format(localSettings.root))
+
     // Prepare data files for database upload
     val setUp: Try[ParArray[Path]] = Exception.allCatch.withTry(
 
