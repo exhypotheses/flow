@@ -1,16 +1,14 @@
 package com.grey
 
 import java.io.File
-import java.nio.file.Path
 
-import com.grey.database.{DataSetUp, DataUpload, TableVariables}
+import com.grey.database.{DataUpload, TableVariables}
 import com.grey.environment.LocalSettings
 import com.grey.libraries.mysql.CreateTable
 import com.grey.pre.{DataStructure, DataWrite}
 import com.grey.source.{DataRead, DataUnload}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
-import scala.collection.parallel.mutable.ParArray
 import scala.language.postfixOps
 import scala.util.Try
 
@@ -22,6 +20,7 @@ import scala.util.Try
 class DataSteps(spark: SparkSession) {
 
   private val localSettings = new LocalSettings()
+
 
   /**
     * Steps
@@ -63,13 +62,10 @@ class DataSteps(spark: SparkSession) {
     // Write
     val fileObjects: Array[File] = new DataWrite().dataWrite(data = structure.get)
 
-    // Set-up data for upload
-    val setUp: Try[ParArray[Path]] = new DataSetUp().dataSetUp(fileObjects = fileObjects)
-
     // Upload
-    val upload: ParArray[Try[Boolean]] = setUp.get.map{ path =>
+    val upload: Array[Try[Boolean]] = fileObjects.map{ file =>
       new DataUpload().dataUpload(tableVariables =
-        tableVariablesInstance.tableVariables(isLocal = true, infile = path.toAbsolutePath.toString))
+        tableVariablesInstance.tableVariables(isLocal = true, infile = file.toString))
     }
 
     // Hence

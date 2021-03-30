@@ -2,7 +2,6 @@ package com.grey.database
 
 class TableVariables {
 
-
   /**
     * Ref. https://dev.mysql.com/doc/refman/8.0/en/load-data.html
     *
@@ -24,8 +23,8 @@ class TableVariables {
          |CREATE TABLE IF NOT EXISTS $tableName (
          |    station_id VARCHAR(15) NOT NULL PRIMARY KEY,
          |    capacity SMALLINT DEFAULT NULL,
-         |    latitude DECIMAL(24, 21) NOT NULL,
-         |    longitude DECIMAL(24, 21) NOT NULL,
+         |    latitude NUMERIC(24, 21) NOT NULL,
+         |    longitude NUMERIC(24, 21) NOT NULL,
          |    name VARCHAR(255) NOT NULL,
          |    address VARCHAR(1023) DEFAULT NULL
          |);
@@ -33,11 +32,14 @@ class TableVariables {
 
 
     // Statement
-    val location: String = if (isLocal) "LOCAL" else ""
-
     val uploadString =
-    raw"""
-       | LOAD DATA $location INFILE '$infile' ${duplicates.toUpperCase} INTO TABLE $tableName FIELDS TERMINATED BY ','  OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
+      s"""
+         |COPY $tableName FROM '$infile' WITH
+         |FORMAT csv
+         |DELIMITER ','
+         |HEADER TRUE
+         |QUOTE '"'
+         |ENCODING UTF8
        """.stripMargin
 
 
@@ -49,3 +51,20 @@ class TableVariables {
 
 
 }
+
+/** Case: MySQL
+
+  val location: String = if (isLocal) "LOCAL" else ""
+
+  val uploadString =
+  raw"""
+     | LOAD DATA $location
+     | INFILE '$infile' ${duplicates.toUpperCase}
+     | INTO TABLE $tableName
+     | FIELDS TERMINATED BY ','
+     | OPTIONALLY ENCLOSED BY '"'
+     | LINES TERMINATED BY '\r\n'
+     | IGNORE 1 LINES;
+      """.stripMargin
+
+  */
