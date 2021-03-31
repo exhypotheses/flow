@@ -3,7 +3,6 @@ package com.grey.database
 class TableVariables {
 
   /**
-    * Ref. https://dev.mysql.com/doc/refman/8.0/en/load-data.html
     *
     * @param isLocal: true | false -> is the file locally located (true) or hosted within a server (false)
     * @param infile: The path to the file location; it includes the file name & extension
@@ -53,7 +52,9 @@ class TableVariables {
 
 }
 
-/** Case: MySQL
+/**
+  https://dev.mysql.com/doc/refman/8.0/en/load-data.html
+  Case: MySQL
 
   val location: String = if (isLocal) "LOCAL" else ""
 
@@ -67,5 +68,4 @@ class TableVariables {
      | LINES TERMINATED BY '\r\n'
      | IGNORE 1 LINES;
       """.stripMargin
-
   */
