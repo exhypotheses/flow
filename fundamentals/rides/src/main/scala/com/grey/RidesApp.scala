@@ -1,6 +1,5 @@
 package com.grey
 
-import java.io.File
 import java.sql.Date
 
 import com.grey.environment.{DataDirectories, LocalSettings}
@@ -24,7 +23,7 @@ object RidesApp {
 
 
     // Spark Session
-    val spark = SparkSession.builder().appName("stations")
+    val spark = SparkSession.builder().appName("rides")
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .config("spark.sql.warehouse.dir", localSettings.warehouseDirectory)
       .getOrCreate()
@@ -33,10 +32,7 @@ object RidesApp {
     // Prepare local directories
     val dataDirectories = new DataDirectories()
     val directories: ParSeq[Try[Boolean]] = List(localSettings.dataDirectory, localSettings.warehouseDirectory)
-      .par.map( directory => dataDirectories.localDirectoryReset(directory) )
-
-    val rootObject = new File(localSettings.root)
-    rootObject.listFiles().par.foreach(_.delete())
+      .par.map(directory => dataDirectories.localDirectoryReset(directory))
 
 
     // Dates
