@@ -2,6 +2,8 @@ package com.grey.source
 
 import java.sql.Date
 
+import com.grey.environment.LocalSettings
+import com.grey.libraries.postgresql.UnloadData
 import com.grey.time.{TimeFormats, TimeSequences, TimeSeries}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.joda.time.DateTime
@@ -10,22 +12,22 @@ import org.joda.time.format.DateTimeFormat
 import scala.util.Try
 import scala.util.control.Exception
 
+
 /**
   *
   * @param spark: A SparkSession instance
   */
 class InterfaceTimeSeries(spark: SparkSession) {
 
-
-  // Today
+  private val localSettings = new LocalSettings()
   private val dateTimeNow: DateTime = DateTime.now
 
 
   // Starting
   private val isTable: Try[DataFrame] = Exception.allCatch.withTry(
-    new com.grey.libraries.mysql.UnloadData(spark = spark)
-      .unloadData(queryString = "SELECT DATE_FORMAT(MAX(start_date), '%Y/%m') as start, MAX(start_date) as filter from rides",
-        databaseString = "mysql.flow")
+    new UnloadData(spark = spark)
+      .unloadData(queryString = "SELECT to_char(MAX(start_date), 'YYYY/MM') as start, MAX(start_date) as filter from rides",
+        databaseString = localSettings.databaseString)
   )
 
 
