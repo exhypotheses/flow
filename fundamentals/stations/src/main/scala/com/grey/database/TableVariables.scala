@@ -14,7 +14,7 @@ class TableVariables {
 
 
     // Table name
-    val tableName = "flow.stations"
+    val tableName = "stations"
 
 
     // Create statement
@@ -35,12 +35,13 @@ class TableVariables {
     val uploadString =
       s"""
          |COPY $tableName FROM '$infile' WITH
-         |FORMAT csv
+         |CSV
          |DELIMITER ','
-         |HEADER TRUE
+         |HEADER
          |QUOTE '"'
-         |ENCODING UTF8
+         |ENCODING 'UTF8'
        """.stripMargin
+    println(uploadString.toString)
 
 
     // Hence
