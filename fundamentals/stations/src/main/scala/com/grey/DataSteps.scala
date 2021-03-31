@@ -4,7 +4,7 @@ import java.io.File
 
 import com.grey.database.{DataUpload, TableVariables}
 import com.grey.environment.LocalSettings
-import com.grey.libraries.mysql.CreateTable
+import com.grey.libraries.postgresql.CreateTable
 import com.grey.pre.{DataStructure, DataWrite}
 import com.grey.source.{DataRead, DataUnload}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
@@ -35,7 +35,7 @@ class DataSteps(spark: SparkSession) {
     // Databases & Tables
     val tableVariablesInstance = new TableVariables()
     val createTable = new CreateTable()
-    val create: Try[Boolean] = createTable.createTable(databaseString = "mysql.flow",
+    val create: Try[Boolean] = createTable.createTable(databaseString = localSettings.databaseString,
       tableVariables = tableVariablesInstance.tableVariables())
 
     // Unload
