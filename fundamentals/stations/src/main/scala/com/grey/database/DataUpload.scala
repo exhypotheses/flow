@@ -1,6 +1,6 @@
 package com.grey.database
 
-
+import com.grey.environment.LocalSettings
 import com.grey.libraries.postgresql.CopyData
 
 import scala.util.Try
@@ -11,7 +11,7 @@ import scala.util.Try
   */
 class DataUpload() {
 
-  // private val localSettings = new LocalSettings()
+  private val localSettings = new LocalSettings()
 
   /**
     *
@@ -21,7 +21,7 @@ class DataUpload() {
 
     // Uploading
     val copyData = new CopyData()
-    val copy: Try[Boolean] = copyData.copyData(databaseString = "postgresql.flow",
+    val copy: Try[Boolean] = copyData.copyData(databaseString = localSettings.databaseString,
       tableVariables = tableVariables)
 
 
