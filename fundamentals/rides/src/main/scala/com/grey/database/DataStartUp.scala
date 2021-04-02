@@ -1,5 +1,7 @@
 package com.grey.database
 
+import java.sql.Date
+
 import com.grey.environment.LocalSettings
 import com.grey.libraries.postgresql.UnloadData
 import com.grey.source.InterfaceVariables
@@ -46,7 +48,7 @@ class DataStartUp(spark: SparkSession) {
         databaseString = localSettings.databaseString)
 
       (isTable.get.head().getAs[String]("start"),
-        isTable.get.head().getAs[String]("filter"))
+        isTable.get.head().getAs[Date]("filter").toString)
 
     } else {
       (interfaceVariables.variable("times", "startDate"),
