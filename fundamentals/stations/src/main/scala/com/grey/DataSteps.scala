@@ -53,25 +53,30 @@ class DataSteps(spark: SparkSession) {
     }
 
     // Structure
-    val structure: Try[Dataset[Row]] = if (read.isSuccess){
+    val structured: Try[Dataset[Row]] = if (read.isSuccess){
       new DataStructure(spark = spark).dataStructure(data = read.get)
     } else {
       sys.error(read.failed.get.getMessage)
     }
 
-    // Write
-    val fileObjects: Array[File] = new DataWrite().dataWrite(data = structure.get)
+    // If there are new records ...
+    if (!structured.get.isEmpty){
 
-    // Upload
-    val upload: Array[Try[Boolean]] = fileObjects.map{ file =>
-      new DataUpload().dataUpload(tableVariables =
-        tableVariablesInstance.tableVariables(isLocal = true, infile = file.toString))
-    }
+      // Write
+      val fileObjects: Array[File] = new DataWrite().dataWrite(data = structured.get)
 
-    // Hence
-    if (upload.head.isSuccess) {
-      println("The table %s has been updated"
-        .format(tableVariablesInstance.tableVariables()("tableName")))
+      // Upload
+      val upload: Array[Try[Boolean]] = fileObjects.map{ file =>
+        new DataUpload().dataUpload(tableVariables =
+          tableVariablesInstance.tableVariables(isLocal = true, infile = file.toString))
+      }
+
+      // Hence
+      if (upload.head.isSuccess) {
+        println("The table %s has been updated"
+          .format(tableVariablesInstance.tableVariables()("tableName")))
+      }
+
     }
 
   }

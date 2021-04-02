@@ -6,7 +6,6 @@ import java.sql.Date
 
 import com.grey.database.{DataUpload, TableVariables}
 import com.grey.environment.LocalSettings
-import com.grey.libraries.postgresql.CreateTable
 import com.grey.pre.{DataStructure, DataWrite}
 import com.grey.source.{DataRead, DataUnload}
 import org.apache.spark.rdd.RDD
@@ -28,21 +27,14 @@ class DataSteps(spark: SparkSession) {
   private val dataUnload = new DataUnload(spark = spark)
   private val dataRead = new DataRead(spark = spark)
   private val dataWrite = new DataWrite()
+  private val tableVariablesInstance = new TableVariables()
+
 
   /**
     *
     * @param listOfDates : List of dates
     */
   def dataSteps(listOfDates: List[DateTime], filterDate: Date): Unit = {
-
-
-    // Table
-    val tableVariablesInstance = new TableVariables()
-    val create: Try[Boolean] = new CreateTable()
-      .createTable(databaseString = localSettings.databaseString, tableVariables = tableVariablesInstance.tableVariables())
-    if (create.isFailure) {
-      sys.error(create.failed.get.getMessage)
-    }
 
 
     // The schema of the data in question
@@ -79,17 +71,17 @@ class DataSteps(spark: SparkSession) {
       }
 
       // Structure
-      val minimal: Dataset[Row] = new DataStructure(spark = spark)
+      val structured: Dataset[Row] = new DataStructure(spark = spark)
         .dataStructure(data = read.get, filterDate = filterDate)
 
       // Write
-      dataWrite.dataWrite(data = minimal, name = dateTime.toString("yyyyMM"))
+      dataWrite.dataWrite(data = structured, name = dateTime.toString("yyyyMM"))
 
     }
 
 
     // Set-up data for upload
-    val fileObjects: Array[File] = arraysOfFileObjects.reduceRight(_ union _)
+    val fileObjects: Array[File] = arraysOfFileObjects.reduce(_ union _)
 
 
     // Upload

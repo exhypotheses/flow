@@ -26,4 +26,9 @@ class LocalSettings {
 
   // Database String
   val databaseString = "postgresql.flow"
+
+
+  // Fields
+  val fieldsOfInterest = List("station_id", "capacity",
+    "latitude", "longitude", "name", "address")
 }

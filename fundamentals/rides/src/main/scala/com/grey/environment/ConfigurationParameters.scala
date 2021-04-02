@@ -10,7 +10,7 @@ class ConfigurationParameters {
     * sql.shuffle.partitions: The number of shuffle partitions for joins & aggregation
     * default.parallelism: The default number of partitions delivered after a transformation
     */
-  val nShufflePartitions = 2
-  val nParallelism = 2
+  val nShufflePartitions = 4
+  val nParallelism = 4
 
 }

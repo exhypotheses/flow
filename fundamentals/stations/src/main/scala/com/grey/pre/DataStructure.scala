@@ -1,5 +1,7 @@
 package com.grey.pre
 
+import com.grey.environment.LocalSettings
+import com.grey.libraries.postgresql.UnloadData
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.functions.explode
 
@@ -12,6 +14,10 @@ import scala.util.control.Exception
   * @param spark: A SparkSession instance
   */
 class DataStructure(spark: SparkSession) {
+
+  private val localSettings = new LocalSettings()
+  private val fieldsOfInterest = localSettings.fieldsOfInterest
+  private val unloadData = new UnloadData(spark = spark)
 
 
   def dataStructure(data: DataFrame): Try[Dataset[Row]] = {
@@ -42,15 +48,32 @@ class DataStructure(spark: SparkSession) {
 
     // ... ascertain distinct records
     val distinct: Try[Dataset[Row]] = Exception.allCatch.withTry(
-      stations.distinct()
+      stations.distinct().selectExpr(fieldsOfInterest: _*)
+    )
+
+
+    // ... identifiers
+    val identifiers: Dataset[Row] = distinct.get.select($"station_id").except(
+        unloadData.unloadData(queryString = s"""SELECT station_id FROM stations""",
+          databaseString = localSettings.databaseString).get
+      )
+
+
+    // ... deduplicate
+    val deduplicated: Try[Dataset[Row]] = Exception.allCatch.withTry(
+      if (!identifiers.isEmpty){
+        distinct.get.join(identifiers, Seq("station_id"), "inner")
+      } else {
+        identifiers
+      }
     )
 
 
     // Hence
-    if (distinct.isSuccess) {
-      distinct
+    if (deduplicated.isSuccess) {
+      deduplicated
     } else {
-      sys.error(distinct.failed.get.getMessage)
+      sys.error(deduplicated.failed.get.getMessage)
     }
 
 
