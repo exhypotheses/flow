@@ -33,4 +33,9 @@ class LocalSettings {
   val databaseString = "postgresql.flow"
 
 
+  // Fields
+  val fieldsOfInterest = List("started_at", "start_station_id",
+    "ended_at", "end_station_id", "duration", "start_date", "start_date_epoch")
+
+
 }
