@@ -2,10 +2,9 @@ package com.grey.source
 
 import java.sql.Date
 
-import com.grey.environment.LocalSettings
-import com.grey.libraries.postgresql.UnloadData
+import com.grey.database.DataStartUp
 import com.grey.time.{TimeFormats, TimeSequences, TimeSeries}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
@@ -19,16 +18,8 @@ import scala.util.control.Exception
   */
 class InterfaceTimeSeries(spark: SparkSession) {
 
-  private val localSettings = new LocalSettings()
   private val dateTimeNow: DateTime = DateTime.now
-
-
-  // Starting
-  private val isTable: Try[DataFrame] = Exception.allCatch.withTry(
-    new UnloadData(spark = spark)
-      .unloadData(queryString = "SELECT to_char(MAX(start_date), 'YYYY/MM') as start, MAX(start_date) as filter from rides",
-        databaseString = localSettings.databaseString)
-  )
+  private val dataStartUp = new DataStartUp(spark = spark)
 
 
   /**
@@ -40,18 +31,7 @@ class InterfaceTimeSeries(spark: SparkSession) {
 
 
     // Lower Boundary
-    val (start, filter): (String, String) = if (isTable.isSuccess) {
-      (isTable.get.head().getAs[String]("start"),
-        isTable.get.head().getAs[String]("filter"))
-    } else {
-      ("", "")
-    }
-
-    val (startDate, filterString): (String, String) = if (start.isEmpty) {
-      (interfaceVariables.variable("times", "startDate"), interfaceVariables.variable("times", "filterString"))
-    } else {
-      (start, filter)
-    }
+    val (startDate, filterString): (String, String) = dataStartUp.dates(interfaceVariables = interfaceVariables)
 
 
     // Upper Boundary
