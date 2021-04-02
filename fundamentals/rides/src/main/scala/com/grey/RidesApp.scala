@@ -2,7 +2,9 @@ package com.grey
 
 import java.sql.Date
 
+import com.grey.database.TableVariables
 import com.grey.environment.{DataDirectories, LocalSettings}
+import com.grey.libraries.postgresql.CreateTable
 import com.grey.source.{InterfaceTimeSeries, InterfaceVariables}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
@@ -33,6 +35,15 @@ object RidesApp {
     val dataDirectories = new DataDirectories()
     val directories: ParSeq[Try[Boolean]] = List(localSettings.dataDirectory, localSettings.warehouseDirectory)
       .par.map(directory => dataDirectories.localDirectoryReset(directory))
+
+
+    // Table
+    val tableVariablesInstance = new TableVariables()
+    val create: Try[Boolean] = new CreateTable()
+      .createTable(databaseString = localSettings.databaseString, tableVariables = tableVariablesInstance.tableVariables())
+    if (create.isFailure) {
+      sys.error(create.failed.get.getMessage)
+    }
 
 
     // Dates
