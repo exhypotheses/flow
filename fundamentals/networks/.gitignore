@@ -7,6 +7,10 @@ syntax: glob
 #*.off
 *.old
 
+# configurations
+*.conf
+
+
 # eclipse conf file
 .settings
 .classpath
