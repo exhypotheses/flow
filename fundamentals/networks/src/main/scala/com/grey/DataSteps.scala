@@ -1,12 +1,10 @@
 package com.grey
 
 
-import com.grey.algorithms.{EdgesData, VerticesData}
-
+import com.grey.algorithms.{Degrees, EdgesData, VerticesData}
 import org.apache.spark.sql.functions.desc
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.storage.StorageLevel
-
 import org.graphframes.GraphFrame
 
 
@@ -40,7 +38,8 @@ class DataSteps(spark: SparkSession) {
     // Edges
     val edgesString = "SELECT start_station_id AS src, end_station_id AS dst, duration, start_date " +
       "FROM rides WHERE end_station_id IS NOT NULL"
-    val edges = edgesData.edgesData(edgesString = edgesString).persist(StorageLevel.MEMORY_ONLY)
+    val edges: Dataset[Row] = edgesData.edgesData(edgesString = edgesString)
+      .persist(StorageLevel.MEMORY_ONLY)
 
 
     // Graphs
@@ -52,7 +51,11 @@ class DataSteps(spark: SparkSession) {
       .orderBy(desc("count"))
     routes.show(33)
 
-    graphs.inDegrees.orderBy(desc("inDegree")).show(33)
+    graphs.inDegrees.orderBy(desc("inDegree"))
+      .show(33)
+
+    new Degrees(spark = spark)
+      .degrees(edges = edges, vertices = vertices)
 
 
   }
