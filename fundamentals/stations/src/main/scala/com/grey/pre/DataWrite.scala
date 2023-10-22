@@ -17,15 +17,21 @@ class DataWrite {
 
 
     // Directory object
-    val directory = localSettings.warehouseDirectory + "data"
+    val directory: String = localSettings.warehouseDirectory + "data"
     val directoryObject = new File(directory)
+    data.show()
 
 
     // Save
     val stream: Try[Unit] = Exception.allCatch.withTry(
-      data.coalesce(1).write.option("header", "true").option("encoding", "UTF-8")
-        .csv(directory)
+      data.coalesce(numPartitions = 1).write.format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .option("quote", "\"")
+        .option("encoding", "UTF-8")
+        .save(directory + localSettings.localSeparator)
     )
+    println(stream.failed.get.getMessage)
 
 
     // Determine extraneous files ... extraneous files array (EFA)

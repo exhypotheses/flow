@@ -40,12 +40,12 @@ class TableVariables {
          |QUOTE '"'
          |ENCODING 'UTF8'
        """.stripMargin
-    println(uploadString.toString)
+    println(uploadString)
 
 
     // Hence
-    Map("stringCreateTable" -> stringCreateTable.toString, "uploadString" -> uploadString.toString,
-      "tableName" -> tableName.toString)
+    Map("stringCreateTable" -> stringCreateTable, "uploadString" -> uploadString,
+      "tableName" -> tableName)
 
   }
 
