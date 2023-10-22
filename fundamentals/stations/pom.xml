@@ -20,7 +20,7 @@
   </properties>
 
   <scm>
-    <url>git@github.com:discourses/flow.git</url>
+    <url>git@github.com:exhypotheses/flow.git</url>
     <connection>scm:git:${project.scm.url}/fundamentals/stations</connection>
     <developerConnection>scm:git:${project.scm.url}/fundamentals/stations</developerConnection>
   </scm>
@@ -68,7 +68,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.4.0</version>
+      <version>42.2.18</version>
     </dependency>
 
     <dependency>
@@ -117,23 +117,37 @@
       <version>1.0</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/net.alchim31.maven/scala-maven-plugin -->
+    <dependency>
+      <groupId>net.alchim31.maven</groupId>
+      <artifactId>scala-maven-plugin</artifactId>
+      <version>4.7.1</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/com.artima.supersafe/supersafe -->
+    <dependency>
+      <groupId>com.artima.supersafe</groupId>
+      <artifactId>supersafe_2.12.16</artifactId>
+      <version>1.1.12</version>
+    </dependency>
+
   </dependencies>
 
 
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>
-    <!--<testSourceDirectory>src/test/scala</testSourceDirectory>-->
     <plugins>
 
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
-        <version>4.3.1</version>
+        <version>4.7.1</version>
         <configuration>
           <compilerPlugins>
             <compilerPlugin>
               <groupId>com.artima.supersafe</groupId>
-              <artifactId>supersafe_2.11.12</artifactId>
+              <artifactId>supersafe_2.12.16</artifactId>
               <version>1.1.12</version>
             </compilerPlugin>
           </compilerPlugins>
@@ -202,7 +216,6 @@
       </plugin>
 
     </plugins>
-
     <finalName>${project.artifactId}-${project.version}.${buildNumber}</finalName>
   </build>
 
