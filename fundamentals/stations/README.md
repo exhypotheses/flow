@@ -1,12 +1,35 @@
+<br>
+
+### Maven Project Object Model (POM)
+
+The full structure of the ``<build></build>`` is:
+
+```xml
+<build>
+    <sourceDirectory>
+    </sourceDirectory>
+    <testSourceDirectory>        
+    </testSourceDirectory>
+    <plugins>
+        <plugin>
+        </plugin>
+        <plugin>
+        </plugin>
+    </plugins>
+    <finalName>
+    </finalName>
+</build>
+```
+
+<br>
+
 ### Stations
 
 Objectives:
 
 * Unload stations data
-
 * Upload its contents into a database
 
-<br>
 <br>
 
 #### Data Schema
@@ -42,3 +65,15 @@ Write to directory `schema`
   spark.sparkContext.parallelize(data.schema)
     .coalesce(1).saveAsTextFile("schema")
 ```
+
+<br>
+<br>
+
+<br>
+<br>
+
+<br>
+<br>
+
+<br>
+<br>
